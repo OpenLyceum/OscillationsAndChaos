@@ -39,7 +39,7 @@ to Scenery coordinates (+y down) via `ModelViewTransform2`.
   `OscillationsAndChaosPreferencesModel` and hot-swaps on preference change.
 - **Nested constants (fleet carve-out).** There is no root `OscillationsAndChaosConstants.ts`;
   numerics live in topical files under `src/common/view/` and `src/common/util/` next to their
-  consumers (see `CLAUDE.md`).
+  consumers (see `AGENTS.md`).
 - **Inline screen summaries (fleet carve-out).** Screens implement `createScreenSummaryContent()`
   in the view rather than separate `*ScreenSummaryContent.ts` files; `BaseScreenView.setupScreenSummary()`
   registers the result.
