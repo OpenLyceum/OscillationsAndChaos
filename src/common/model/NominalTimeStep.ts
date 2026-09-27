@@ -6,7 +6,7 @@
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
 
-export default class NominalTimeStep extends EnumerationValue {
+export class NominalTimeStep extends EnumerationValue {
   public static readonly FINEST = new NominalTimeStep(0.00001); // 0.01 ms
   public static readonly VERY_SMALL = new NominalTimeStep(0.0001); // 0.1 ms
   public static readonly SMALL = new NominalTimeStep(0.0005); // 0.5 ms

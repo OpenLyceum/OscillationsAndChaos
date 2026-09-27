@@ -17,7 +17,7 @@ import OscillationsAndChaosColors from "../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
 import OscillationsAndChaosPreferences from "./OscillationsAndChaosPreferencesModel.js";
 
-export default class OscillationsAndChaosAudioPreferencesNode extends VBox {
+export class OscillationsAndChaosAudioPreferencesNode extends VBox {
   public constructor(tandem: Tandem) {
     super({
       align: "left",

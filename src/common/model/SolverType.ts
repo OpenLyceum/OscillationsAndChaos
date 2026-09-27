@@ -4,7 +4,7 @@
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 
-export default class SolverType extends EnumerationValue {
+export class SolverType extends EnumerationValue {
   public static readonly RK4 = new SolverType();
   public static readonly ADAPTIVE_RK45 = new SolverType();
   public static readonly FOREST_RUTH_PEFRL = new SolverType();

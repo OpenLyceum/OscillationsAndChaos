@@ -4,7 +4,7 @@
 
 import { Enumeration, EnumerationValue } from "scenerystack/phet-core";
 
-export default class SpringVisualizationType extends EnumerationValue {
+export class SpringVisualizationType extends EnumerationValue {
   /**
    * Classic spring visualization with simple coil pattern
    */

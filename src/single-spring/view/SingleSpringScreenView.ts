@@ -31,7 +31,7 @@ import {
   SPRING_RADIUS,
   SPRING_RIGHT_END_LENGTH,
 } from "../../common/view/SpringVisualizationConstants.js";
-import SpringVisualizationType from "../../common/view/SpringVisualizationType.js";
+import { SpringVisualizationType } from "../../common/view/SpringVisualizationType.js";
 import { SPACING_LARGE } from "../../common/view/UILayoutConstants.js";
 import type { VectorNode } from "../../common/view/VectorNode.js";
 import { VectorNodeFactory } from "../../common/view/VectorNodeFactory.js";

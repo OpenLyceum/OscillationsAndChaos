@@ -20,10 +20,10 @@ import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndCh
 import { AdaptiveRK45Solver } from "./AdaptiveRK45Solver.js";
 import { DormandPrince87Solver } from "./DormandPrince87Solver.js";
 import { ForestRuthPEFRLSolver } from "./ForestRuthPEFRLSolver.js";
-import type NominalTimeStep from "./NominalTimeStep.js";
+import type { NominalTimeStep } from "./NominalTimeStep.js";
 import type { ODESolver } from "./ODESolver.js";
 import { RungeKuttaSolver } from "./RungeKuttaSolver.js";
-import SolverType from "./SolverType.js";
+import { SolverType } from "./SolverType.js";
 
 /**
  * Abstract base class that all physics models should extend.

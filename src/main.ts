@@ -35,7 +35,7 @@ window.katex = katex;
 
 import { onReadyToLaunch, PreferencesModel, Sim } from "scenerystack/sim";
 import { Tandem } from "scenerystack/tandem";
-import SolverType from "./common/model/SolverType.js";
+import { SolverType } from "./common/model/SolverType.js";
 import {
   createDoublePendulumIcon,
   createDoubleSpringIcon,
@@ -43,15 +43,15 @@ import {
   createSingleSpringIcon,
 } from "./common/OscillationsAndChaosScreenIcons.js";
 import SimulationAnnouncer from "./common/util/SimulationAnnouncer.js";
-import SpringVisualizationType from "./common/view/SpringVisualizationType.js";
+import { SpringVisualizationType } from "./common/view/SpringVisualizationType.js";
 import { DoublePendulumScreen } from "./double-pendulum/DoublePendulumScreen.js";
 import { DoubleSpringScreen } from "./double-spring/DoubleSpringScreen.js";
 import { StringManager } from "./i18n/StringManager.js";
 import OscillationsAndChaosColors from "./OscillationsAndChaosColors.js";
 import { PendulumScreen } from "./pendulum/PendulumScreen.js";
-import OscillationsAndChaosAudioPreferencesNode from "./preferences/OscillationsAndChaosAudioPreferencesNode.js";
+import { OscillationsAndChaosAudioPreferencesNode } from "./preferences/OscillationsAndChaosAudioPreferencesNode.js";
 import OscillationsAndChaosPreferences from "./preferences/OscillationsAndChaosPreferencesModel.js";
-import OscillationsAndChaosSimulationPreferencesNode from "./preferences/OscillationsAndChaosSimulationPreferencesNode.js";
+import { OscillationsAndChaosSimulationPreferencesNode } from "./preferences/OscillationsAndChaosSimulationPreferencesNode.js";
 import { SingleSpringScreen } from "./single-spring/SingleSpringScreen.js";
 
 onReadyToLaunch(() => {

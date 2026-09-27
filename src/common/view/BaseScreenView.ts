@@ -50,7 +50,7 @@ import type { Preset } from "../model/Preset.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 import { GRAPH_LEFT_MARGIN, GRAPH_TO_VECTOR_PANEL_SPACING } from "./DialogAndPanelConstants.js";
 import { FONT_SIZE_BODY_TEXT, FONT_SIZE_SECONDARY_LABEL } from "./FontSizeConstants.js";
-import ConfigurableGraph from "./graph/ConfigurableGraph.js";
+import { ConfigurableGraph } from "./graph/ConfigurableGraph.js";
 import type { PlottableProperty } from "./graph/PlottableProperty.js";
 import {
   FLAT_INFO_BUTTON_OPTIONS,

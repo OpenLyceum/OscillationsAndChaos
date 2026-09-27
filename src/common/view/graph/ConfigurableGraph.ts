@@ -14,12 +14,12 @@ import { StringManager } from "../../../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../../OscillationsAndChaosNamespace.js";
 import SimulationAnnouncer from "../../util/SimulationAnnouncer.js";
-import GraphControlsPanel from "./GraphControlsPanel.js";
-import GraphDataManager from "./GraphDataManager.js";
-import GraphInteractionHandler from "./GraphInteractionHandler.js";
+import { GraphControlsPanel } from "./GraphControlsPanel.js";
+import { GraphDataManager } from "./GraphDataManager.js";
+import { GraphInteractionHandler } from "./GraphInteractionHandler.js";
 import type { PlottableProperty } from "./PlottableProperty.js";
 
-export default class ConfigurableGraph extends Node {
+export class ConfigurableGraph extends Node {
   private readonly availableProperties: PlottableProperty[];
   private readonly xPropertyProperty: Property<PlottableProperty>;
   private readonly yPropertyProperty: Property<PlottableProperty>;

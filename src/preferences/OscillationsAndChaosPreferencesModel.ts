@@ -7,9 +7,9 @@
 
 import { BooleanProperty, EnumerationProperty } from "scenerystack/axon";
 import { Tandem } from "scenerystack/tandem";
-import NominalTimeStep from "../common/model/NominalTimeStep.js";
-import SolverType from "../common/model/SolverType.js";
-import SpringVisualizationType from "../common/view/SpringVisualizationType.js";
+import { NominalTimeStep } from "../common/model/NominalTimeStep.js";
+import { SolverType } from "../common/model/SolverType.js";
+import { SpringVisualizationType } from "../common/view/SpringVisualizationType.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
 import oscillationsAndChaosQueryParameters from "./oscillationsAndChaosQueryParameters.js";
 

@@ -11,15 +11,15 @@
 import { HBox, HStrut, Node, Text, VBox } from "scenerystack/scenery";
 import { PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox, ComboBox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
-import NominalTimeStep from "../common/model/NominalTimeStep.js";
-import SolverType from "../common/model/SolverType.js";
-import SpringVisualizationType from "../common/view/SpringVisualizationType.js";
+import { NominalTimeStep } from "../common/model/NominalTimeStep.js";
+import { SolverType } from "../common/model/SolverType.js";
+import { SpringVisualizationType } from "../common/view/SpringVisualizationType.js";
 import { StringManager } from "../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
 import OscillationsAndChaosPreferences from "./OscillationsAndChaosPreferencesModel.js";
 
-export default class OscillationsAndChaosSimulationPreferencesNode extends VBox {
+export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
   public constructor() {
     const stringManager = StringManager.getInstance();
     const preferencesLabels = stringManager.getPreferencesLabels();
