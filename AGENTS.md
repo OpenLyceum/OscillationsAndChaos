@@ -56,7 +56,7 @@ per-screen `get*ScreenSummaryStrings()` / `get*VoicingStrings()` accessors.
   `src/common/util/` — no root `OscillationsAndChaosConstants.ts`.
 - **Extra `src/` root entries:** `src/assets/` (bundled screenshot), `src/doc/` (internal dev
   notes), `vite-env.d.ts`.
-- **Domain clock:** `BaseModel` owns play/pause and forced stepping instead of composing fleet-standard `TimeModel` (`src/common/TimeModel.ts` is present for shared reference only).
+- **Domain clock:** `BaseModel` owns play/pause and forced stepping instead of composing fleet-standard `TimeModel`.
 - **Biome `style.noNonNullAssertion: off`:** dense canvas/WebGL and numeric paths use intentional
   non-null assertions; enabling the rule floods lint with noise without improving safety here.
 - **Template drift (Baton `check-template-drift.sh`):** `biome.json` (the `noNonNullAssertion` override above).

@@ -6,7 +6,6 @@
 import { NumberProperty } from "scenerystack/axon";
 import { describe, expect, it } from "vitest";
 import { StatePropertyMapper } from "../src/common/model/StatePropertyMapper.js";
-import { TimeModel } from "../src/common/TimeModel.js";
 import { describeDisposalLeaks, forceGC } from "./helpers/memoryLeak.js";
 
 function createAndDisposeMapper(): WeakRef<object> {
@@ -37,4 +36,4 @@ describe("Memory leak regression", () => {
   });
 });
 
-describeDisposalLeaks([{ name: "TimeModel", create: () => new TimeModel(), idempotentDispose: true }]);
+describeDisposalLeaks([]);
