@@ -34,7 +34,6 @@ npm start        # dev server → http://localhost:5173
 | `npm run lint` | Biome lint check |
 | `npm run format` | Auto-format all files |
 | `npm run fix` | Lint + auto-fix |
-| `npm run serve` | Serve production build locally |
 | `npm run watch` | Watch TypeScript files |
 | `npm run icons` | Regenerate PNG icons from `public/icons/icon.svg` |
 | `npm run clean` | Remove `dist/` |
