@@ -87,7 +87,7 @@ Gate: `npm run check && npm run lint && npm run build && npm test`.
 ## Multi-screen pattern
 
 Four independent screen models (no shared root model). To add a screen: mirror an existing folder,
-register in `main.ts`, add locale keys and `StringManager` getters. See `doc/multi-screen.md`.
+register in `main.ts`, add locale keys and `StringManager` getters. See [SceneryStackTemplate `doc/multi-screen.md`](https://github.com/OpenLyceum/SceneryStackTemplate/blob/main/doc/multi-screen.md).
 
 ## Internal developer notes
 
