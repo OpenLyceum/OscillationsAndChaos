@@ -1,14 +1,20 @@
 /**
  * oscillationsAndChaosQueryParameters.ts
  *
- * Sim-specific startup query parameters for Oscillations And Chaos. These
- * provide the initial values for the sim-specific preferences in
- * OscillationsAndChaosPreferences. Public-facing parameters set `public: true`.
+ * Sim-specific startup query parameters. This is the single place where every
+ * sim-specific query parameter is declared and documented. Public-facing
+ * parameters (intended for end users / sharing links) must set `public: true`.
+ *
+ * ── How to add a query parameter ──────────────────────────────────────────────
+ * 1. Add an entry below with a `type`, `defaultValue`, and (if user-facing)
+ *    `public: true`. Add `isValidValue` to bound numeric ranges.
+ * 2. If it should also be user-editable at runtime, surface it as a preference
+ *    in OscillationsAndChaosPreferencesModel (initialize that Property from this query parameter).
  *
  * Enumeration-valued parameters use the enumeration's string keys (e.g. "RK4")
  * and are mapped back to enumeration values in OscillationsAndChaosPreferences.
  *
- * Usage: append e.g. `?solverType=ADAPTIVE_RK45&nominalTimeStep=SMALL` to the URL.
+ * Usage: append e.g. `?solverType=ADAPTIVE_RK45&nominalTimeStep=SMALL` to the sim URL.
  */
 
 import { logGlobal } from "scenerystack/phet-core";
