@@ -55,7 +55,6 @@ import { OscillationsAndChaosSimulationPreferencesNode } from "./preferences/Osc
 import { SingleSpringScreen } from "./single-spring/SingleSpringScreen.js";
 
 onReadyToLaunch(() => {
-  // Get the string manager instance
   const stringManager = StringManager.getInstance();
   const screenNames = stringManager.getScreenNames();
 
@@ -63,40 +62,6 @@ onReadyToLaunch(() => {
   // OscillationsAndChaosSimulationPreferencesNode / OscillationsAndChaosAudioPreferencesNode.
   const solverNames = stringManager.getSolverNames();
   const springTypeNames = stringManager.getSpringTypeNames();
-
-  const simOptions = {
-    webgl: true,
-    preferencesModel: new PreferencesModel({
-      visualOptions: {
-        supportsProjectorMode: true,
-        supportsInteractiveHighlights: true,
-      },
-      localizationOptions: {
-        // Adds a language picker in Preferences → Language
-        supportsDynamicLocale: true,
-      },
-      audioOptions: {
-        supportsVoicing: true,
-        // Voicing only. Leave sound off, and do not set supportsSound in src/init.ts.
-        supportsSound: false,
-        customPreferences: [
-          {
-            createContent: (tandem: Tandem) => {
-              return new OscillationsAndChaosAudioPreferencesNode(tandem);
-            },
-            column: "right",
-          },
-        ],
-      },
-      simulationOptions: {
-        customPreferences: [
-          {
-            createContent: () => new OscillationsAndChaosSimulationPreferencesNode(),
-          },
-        ],
-      },
-    }),
-  };
 
   // Add accessibility announcements for preference changes
   const a11yStrings = stringManager.getA11yStrings();
@@ -138,6 +103,7 @@ onReadyToLaunch(() => {
 
   const screens = [
     new SingleSpringScreen({
+      // The screen name Property updates automatically when the locale changes
       name: screenNames.singleSpringStringProperty,
       tandem: Tandem.ROOT.createTandem("singleSpringScreen"),
       backgroundColorProperty: OscillationsAndChaosColors.backgroundColorProperty,
@@ -145,6 +111,7 @@ onReadyToLaunch(() => {
       navigationBarIcon: createSingleSpringIcon(),
     }),
     new DoubleSpringScreen({
+      // The screen name Property updates automatically when the locale changes
       name: screenNames.doubleSpringStringProperty,
       tandem: Tandem.ROOT.createTandem("doubleSpringScreen"),
       backgroundColorProperty: OscillationsAndChaosColors.backgroundColorProperty,
@@ -152,6 +119,7 @@ onReadyToLaunch(() => {
       navigationBarIcon: createDoubleSpringIcon(),
     }),
     new PendulumScreen({
+      // The screen name Property updates automatically when the locale changes
       name: screenNames.pendulumStringProperty,
       tandem: Tandem.ROOT.createTandem("pendulumScreen"),
       backgroundColorProperty: OscillationsAndChaosColors.backgroundColorProperty,
@@ -159,6 +127,7 @@ onReadyToLaunch(() => {
       navigationBarIcon: createPendulumIcon(),
     }),
     new DoublePendulumScreen({
+      // The screen name Property updates automatically when the locale changes
       name: screenNames.doublePendulumStringProperty,
       tandem: Tandem.ROOT.createTandem("doublePendulumScreen"),
       backgroundColorProperty: OscillationsAndChaosColors.backgroundColorProperty,
@@ -167,6 +136,40 @@ onReadyToLaunch(() => {
     }),
   ];
 
-  const sim = new Sim(stringManager.getTitleStringProperty(), screens, simOptions);
+  const sim = new Sim(stringManager.getTitleStringProperty(), screens, {
+    preferencesModel: new PreferencesModel({
+      visualOptions: {
+        // Adds a "Projector Mode" toggle in Preferences → Visual
+        supportsProjectorMode: true,
+        // Enables keyboard-navigation highlight outlines
+        supportsInteractiveHighlights: true,
+      },
+      simulationOptions: {
+        customPreferences: [
+          {
+            createContent: () => new OscillationsAndChaosSimulationPreferencesNode(),
+          },
+        ],
+      },
+      localizationOptions: {
+        // Adds a language picker in Preferences → Language
+        supportsDynamicLocale: true,
+      },
+      audioOptions: {
+        // Voicing only. Leave sound off, and do not set supportsSound in src/init.ts.
+        supportsSound: false,
+        supportsVoicing: true,
+        customPreferences: [
+          {
+            createContent: (tandem: Tandem) => {
+              return new OscillationsAndChaosAudioPreferencesNode(tandem);
+            },
+            column: "right",
+          },
+        ],
+      },
+    }),
+    webgl: true,
+  });
   sim.start();
 });
