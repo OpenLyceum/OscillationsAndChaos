@@ -43,8 +43,8 @@
     "prepare": "git rev-parse --is-inside-work-tree >/dev/null 2>&1 && git config core.hooksPath .githooks || true"
   },
   "dependencies": {
-    "katex": "^0.18.7",
-    "scenerystack": "^3.0.0"
+    "scenerystack": "^3.0.0",
+    "katex": "^0.18.7"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
@@ -65,7 +65,6 @@
   "overrides": {
     "lodash": "~4.18.1",
     "three": "~0.125.2",
-    "picomatch": "^2.3.2",
     "brace-expansion": "~5.0.9"
   }
 }
