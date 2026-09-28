@@ -14,7 +14,7 @@ import { GridIcon } from "scenerystack/scenery-phet";
 import { Checkbox, Panel, type PanelOptions } from "scenerystack/sun";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 
 /**
@@ -163,21 +163,21 @@ export class ToolsControlPanel extends Panel {
 
     // Add accessibility announcements for tool visibility changes
     grid.showProperty.lazyLink((showGrid) => {
-      if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
         const announcement = showGrid ? grid.a11yStrings.shown.value : grid.a11yStrings.hidden.value;
         SimulationAnnouncer.announceSimulationState(announcement);
       }
     });
 
     distance.showProperty.lazyLink((showDistanceTool) => {
-      if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
         const announcement = showDistanceTool ? distance.a11yStrings.shown.value : distance.a11yStrings.hidden.value;
         SimulationAnnouncer.announceSimulationState(announcement);
       }
     });
 
     stopwatch.showProperty.lazyLink((showStopwatch) => {
-      if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
         const announcement = showStopwatch ? stopwatch.a11yStrings.shown.value : stopwatch.a11yStrings.hidden.value;
         SimulationAnnouncer.announceSimulationState(announcement);
       }
@@ -186,7 +186,7 @@ export class ToolsControlPanel extends Panel {
     // Add protractor announcements if provided (for pendulum screens)
     if (protractor) {
       protractor.showProperty.lazyLink((showProtractor) => {
-        if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+        if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
           const announcement = showProtractor
             ? protractor.a11yStrings.shown.value
             : protractor.a11yStrings.hidden.value;
@@ -198,7 +198,7 @@ export class ToolsControlPanel extends Panel {
     // Add graph announcements if provided (for configurable graph)
     if (graph) {
       graph.showProperty.lazyLink((showGraph) => {
-        if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+        if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
           const announcement = showGraph ? graph.a11yStrings.shown.value : graph.a11yStrings.hidden.value;
           SimulationAnnouncer.announceSimulationState(announcement);
         }

@@ -50,7 +50,7 @@ import { StringManager } from "./i18n/StringManager.js";
 import OscillationsAndChaosColors from "./OscillationsAndChaosColors.js";
 import { PendulumScreen } from "./pendulum/PendulumScreen.js";
 import { OscillationsAndChaosAudioPreferencesNode } from "./preferences/OscillationsAndChaosAudioPreferencesNode.js";
-import OscillationsAndChaosPreferences from "./preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "./preferences/OscillationsAndChaosPreferencesModel.js";
 import { OscillationsAndChaosSimulationPreferencesNode } from "./preferences/OscillationsAndChaosSimulationPreferencesNode.js";
 import { SingleSpringScreen } from "./single-spring/SingleSpringScreen.js";
 
@@ -66,8 +66,8 @@ onReadyToLaunch(() => {
   // Add accessibility announcements for preference changes
   const a11yStrings = stringManager.getA11yStrings();
 
-  OscillationsAndChaosPreferences.solverTypeProperty.lazyLink((solverType) => {
-    if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+  oscillationsAndChaosPreferences.solverTypeProperty.lazyLink((solverType) => {
+    if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
       let solverName = "";
       switch (solverType) {
         case SolverType.RK4:
@@ -89,8 +89,8 @@ onReadyToLaunch(() => {
     }
   });
 
-  OscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
-    if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+  oscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
+    if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
       const springTypeName =
         springType === SpringVisualizationType.CLASSIC
           ? springTypeNames.classicStringProperty.value

@@ -38,7 +38,7 @@ import { VectorNodeFactory } from "../../common/view/VectorNodeFactory.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import type { SingleSpringModel } from "../model/SingleSpringModel.js";
 import { SingleSpringPresets } from "../model/SingleSpringPresets.js";
 import { SingleSpringScreenSummaryContent } from "./SingleSpringScreenSummaryContent.js";
@@ -129,7 +129,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     this.addChild(this.parametricSpringNode);
 
     this.currentSpringNode =
-      OscillationsAndChaosPreferences.springVisualizationTypeProperty.value === SpringVisualizationType.PARAMETRIC
+      oscillationsAndChaosPreferences.springVisualizationTypeProperty.value === SpringVisualizationType.PARAMETRIC
         ? this.parametricSpringNode
         : this.classicSpringNode;
     this.classicSpringNode.visible = this.currentSpringNode === this.classicSpringNode;
@@ -225,7 +225,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
 
     // Listen to spring visualization preference changes
     // Using lazyLink to avoid triggering during initialization
-    OscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
+    oscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
       this.switchSpringVisualization(springType);
     });
 

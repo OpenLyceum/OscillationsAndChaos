@@ -45,7 +45,7 @@ import { ComboBox, Panel } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import type { Preset } from "../model/Preset.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 import { GRAPH_LEFT_MARGIN, GRAPH_TO_VECTOR_PANEL_SPACING } from "./DialogAndPanelConstants.js";
@@ -523,7 +523,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       if (document.hidden) {
         // Tab became hidden
         if (
-          OscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty.value &&
+          oscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty.value &&
           this.model.isPlayingProperty.value
         ) {
           // Store that we were playing before hiding
@@ -531,7 +531,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
           // Pause the simulation
           this.model.isPlayingProperty.value = false;
         }
-      } else if (OscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty.value && this.wasPlayingBeforeHidden) {
+      } else if (oscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty.value && this.wasPlayingBeforeHidden) {
         // Tab became visible — restore playing state
         this.model.isPlayingProperty.value = true;
         this.wasPlayingBeforeHidden = false;

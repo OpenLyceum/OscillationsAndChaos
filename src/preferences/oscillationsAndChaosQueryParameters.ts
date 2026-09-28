@@ -12,7 +12,7 @@
  *    in OscillationsAndChaosPreferencesModel (initialize that Property from this query parameter).
  *
  * Enumeration-valued parameters use the enumeration's string keys (e.g. "RK4")
- * and are mapped back to enumeration values in OscillationsAndChaosPreferences.
+ * and are mapped back to enumeration values in oscillationsAndChaosPreferences.
  *
  * Usage: append e.g. `?solverType=ADAPTIVE_RK45&nominalTimeStep=SMALL` to the sim URL.
  */

@@ -15,7 +15,7 @@ import { ArrowNode, PhetColorScheme } from "scenerystack/scenery-phet";
 import { Checkbox, Panel, type PanelOptions } from "scenerystack/sun";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 
 /**
@@ -148,21 +148,21 @@ export class VectorControlPanel extends Panel {
 
     // Add accessibility announcements for vector visibility changes
     velocity.showProperty.lazyLink((showVelocity) => {
-      if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
         const announcement = showVelocity ? velocity.a11yStrings.shown.value : velocity.a11yStrings.hidden.value;
         SimulationAnnouncer.announceSimulationState(announcement);
       }
     });
 
     force.showProperty.lazyLink((showForce) => {
-      if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
         const announcement = showForce ? force.a11yStrings.shown.value : force.a11yStrings.hidden.value;
         SimulationAnnouncer.announceSimulationState(announcement);
       }
     });
 
     acceleration.showProperty.lazyLink((showAcceleration) => {
-      if (OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
         const announcement = showAcceleration
           ? acceleration.a11yStrings.shown.value
           : acceleration.a11yStrings.hidden.value;

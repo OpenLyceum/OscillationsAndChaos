@@ -16,7 +16,7 @@ import { assert } from "scenerystack";
 import { BooleanProperty, EnumerationProperty, NumberProperty } from "scenerystack/axon";
 import { TimeSpeed } from "scenerystack/scenery-phet";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import { AdaptiveRK45Solver } from "./AdaptiveRK45Solver.js";
 import { DormandPrince87Solver } from "./DormandPrince87Solver.js";
 import { ForestRuthPEFRLSolver } from "./ForestRuthPEFRLSolver.js";
@@ -47,15 +47,15 @@ export abstract class BaseModel {
     this.timeSpeedProperty = new EnumerationProperty(TimeSpeed.NORMAL);
 
     // Create initial physics solver based on preference
-    this.solver = this.createSolver(OscillationsAndChaosPreferences.solverTypeProperty.value);
+    this.solver = this.createSolver(oscillationsAndChaosPreferences.solverTypeProperty.value);
 
     // Listen for solver type changes and recreate solver
-    OscillationsAndChaosPreferences.solverTypeProperty.link((solverType: SolverType) => {
+    oscillationsAndChaosPreferences.solverTypeProperty.link((solverType: SolverType) => {
       this.solver = this.createSolver(solverType);
     });
 
     // Listen for nominal time step changes and update the solver
-    OscillationsAndChaosPreferences.nominalTimeStepProperty.link((nominalTimeStep: NominalTimeStep) => {
+    oscillationsAndChaosPreferences.nominalTimeStepProperty.link((nominalTimeStep: NominalTimeStep) => {
       this.solver.setFixedTimeStep(nominalTimeStep.value);
     });
   }
@@ -80,7 +80,7 @@ export abstract class BaseModel {
     }
 
     // Apply the current nominal time step preference
-    solver.setFixedTimeStep(OscillationsAndChaosPreferences.nominalTimeStepProperty.value.value);
+    solver.setFixedTimeStep(oscillationsAndChaosPreferences.nominalTimeStepProperty.value.value);
 
     return solver;
   }

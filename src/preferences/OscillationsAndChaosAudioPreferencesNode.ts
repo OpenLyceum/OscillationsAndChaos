@@ -15,7 +15,7 @@ import type { Tandem } from "scenerystack/tandem";
 import { StringManager } from "../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "./OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "./OscillationsAndChaosPreferencesModel.js";
 
 export class OscillationsAndChaosAudioPreferencesNode extends VBox {
   public constructor(tandem: Tandem) {
@@ -42,7 +42,7 @@ export class OscillationsAndChaosAudioPreferencesNode extends VBox {
     };
 
     const parameterAnnouncementsCheckbox = new Checkbox(
-      OscillationsAndChaosPreferences.announceParameterChangesProperty,
+      oscillationsAndChaosPreferences.announceParameterChangesProperty,
       new Text(audioStrings.announceParameterChangesStringProperty, {
         font: new PhetFont(16),
         fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
@@ -61,7 +61,7 @@ export class OscillationsAndChaosAudioPreferencesNode extends VBox {
     });
 
     const stateAnnouncementsCheckbox = new Checkbox(
-      OscillationsAndChaosPreferences.announceStateChangesProperty,
+      oscillationsAndChaosPreferences.announceStateChangesProperty,
       new Text(audioStrings.announceStateChangesStringProperty, {
         font: new PhetFont(16),
         fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
@@ -80,7 +80,7 @@ export class OscillationsAndChaosAudioPreferencesNode extends VBox {
     });
 
     const dragAnnouncementsCheckbox = new Checkbox(
-      OscillationsAndChaosPreferences.announceDragInteractionsProperty,
+      oscillationsAndChaosPreferences.announceDragInteractionsProperty,
       new Text(audioStrings.announceDragInteractionsStringProperty, {
         font: new PhetFont(16),
         fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,

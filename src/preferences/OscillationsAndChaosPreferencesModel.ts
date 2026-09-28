@@ -1,8 +1,13 @@
 /**
  * OscillationsAndChaosPreferencesModel.ts
  *
- * Global preferences for Oscillations And Chaos.
- * Contains simulation-wide settings that users can configure.
+ * Model for the simulation-specific preferences shown in Preferences →
+ * Simulation. Each preference Property takes its initial value from the
+ * corresponding query parameter in oscillationsAndChaosQueryParameters.
+ *
+ * One shared instance is constructed here so every screen and the Preferences
+ * dialog read the same Properties. The default tandem parent is
+ * Tandem.PREFERENCES, which keeps the existing PhET-iO paths.
  */
 
 import { BooleanProperty, EnumerationProperty } from "scenerystack/axon";
@@ -13,34 +18,19 @@ import { SpringVisualizationType } from "../common/view/SpringVisualizationType.
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
 import oscillationsAndChaosQueryParameters from "./oscillationsAndChaosQueryParameters.js";
 
-/**
- * Preferences for Oscillations And Chaos. Each preference's initial value comes
- * from the corresponding query parameter (see oscillationsAndChaosQueryParameters).
- */
-const OscillationsAndChaosPreferences = {
+export class OscillationsAndChaosPreferencesModel {
   /**
    * Whether to automatically pause the simulation when the browser tab is hidden.
    * When enabled, the simulation will pause when switching tabs or minimizing the browser,
    * preventing large dt jumps and maintaining smooth playback.
    */
-  autoPauseWhenTabHiddenProperty: new BooleanProperty(oscillationsAndChaosQueryParameters.autoPauseWhenTabHidden, {
-    tandem: Tandem.PREFERENCES.createTandem("simulationPreferences").createTandem("autoPauseWhenTabHiddenProperty"),
-    phetioDocumentation: "Controls whether the simulation automatically pauses when the browser tab becomes hidden",
-    phetioFeatured: true,
-  }),
+  public readonly autoPauseWhenTabHiddenProperty: BooleanProperty;
 
   /**
    * The ODE solver method to use for numerical integration.
    * Options: RK4, Adaptive RK45, Adaptive Euler, Modified Midpoint, Forest-Ruth PEFRL, Dormand-Prince 8(7)
    */
-  solverTypeProperty: new EnumerationProperty(
-    SolverType.enumeration.getValue(oscillationsAndChaosQueryParameters.solverType as string),
-    {
-      tandem: Tandem.PREFERENCES.createTandem("simulationPreferences").createTandem("solverTypeProperty"),
-      phetioDocumentation: "Selects the numerical integration method used for solving differential equations",
-      phetioFeatured: true,
-    },
-  ),
+  public readonly solverTypeProperty: EnumerationProperty<SolverType>;
 
   /**
    * The nominal (target) time step for numerical integration in seconds.
@@ -48,27 +38,13 @@ const OscillationsAndChaosPreferences = {
    * For fixed-step solvers, this is the actual step size used.
    * Options: 0.01ms, 0.1ms, 0.5ms, 1ms (default), 5ms
    */
-  nominalTimeStepProperty: new EnumerationProperty(
-    NominalTimeStep.enumeration.getValue(oscillationsAndChaosQueryParameters.nominalTimeStep as string),
-    {
-      tandem: Tandem.PREFERENCES.createTandem("simulationPreferences").createTandem("nominalTimeStepProperty"),
-      phetioDocumentation: "Sets the target time step for numerical integration in seconds",
-      phetioFeatured: true,
-    },
-  ),
+  public readonly nominalTimeStepProperty: EnumerationProperty<NominalTimeStep>;
 
   /**
    * The spring visualization type to use for rendering springs.
    * Options: Classic (simple coil pattern), Parametric (realistic 3D appearance)
    */
-  springVisualizationTypeProperty: new EnumerationProperty(
-    SpringVisualizationType.enumeration.getValue(oscillationsAndChaosQueryParameters.springVisualizationType as string),
-    {
-      tandem: Tandem.PREFERENCES.createTandem("simulationPreferences").createTandem("springVisualizationTypeProperty"),
-      phetioDocumentation: "Selects the visual style for rendering springs (Classic or Parametric)",
-      phetioFeatured: true,
-    },
-  ),
+  public readonly springVisualizationTypeProperty: EnumerationProperty<SpringVisualizationType>;
 
   /**
    * Whether to respect the user's prefers-reduced-motion setting.
@@ -76,59 +52,129 @@ const OscillationsAndChaosPreferences = {
    * indicated they prefer reduced motion in their operating system settings.
    * This is checked automatically from the browser's media query.
    */
-  reducedMotionProperty: new BooleanProperty(
-    typeof window !== "undefined" && window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches,
-    {
-      tandem: Tandem.PREFERENCES.createTandem("visualPreferences").createTandem("reducedMotionProperty"),
-      phetioDocumentation: "Respects the user's operating system preference for reduced motion",
-      phetioFeatured: false,
-    },
-  ),
+  public readonly reducedMotionProperty: BooleanProperty;
 
   /**
    * Whether to enable high contrast mode for better visibility.
    * When enabled, uses higher contrast colors and thicker focus indicators.
    */
-  highContrastModeProperty: new BooleanProperty(oscillationsAndChaosQueryParameters.highContrastMode, {
-    tandem: Tandem.PREFERENCES.createTandem("visualPreferences").createTandem("highContrastModeProperty"),
-    phetioDocumentation: "Enables high contrast mode with enhanced color contrast and focus indicators",
-    phetioFeatured: false,
-  }),
-
-  /**
-   * Voicing-specific preferences for simulation announcements
-   */
+  public readonly highContrastModeProperty: BooleanProperty;
 
   /**
    * Whether to announce parameter changes (mass, spring constant, damping, etc.)
    */
-  announceParameterChangesProperty: new BooleanProperty(oscillationsAndChaosQueryParameters.announceParameterChanges, {
-    tandem: Tandem.PREFERENCES.createTandem("audioPreferences").createTandem("announceParameterChangesProperty"),
-    phetioDocumentation:
-      "Controls voicing announcements for parameter changes such as mass, spring constant, and damping",
-    phetioFeatured: true,
-  }),
+  public readonly announceParameterChangesProperty: BooleanProperty;
 
   /**
    * Whether to announce state changes (play/pause, reset, step, speed changes)
    */
-  announceStateChangesProperty: new BooleanProperty(oscillationsAndChaosQueryParameters.announceStateChanges, {
-    tandem: Tandem.PREFERENCES.createTandem("audioPreferences").createTandem("announceStateChangesProperty"),
-    phetioDocumentation: "Controls voicing announcements for simulation state changes like play, pause, and reset",
-    phetioFeatured: true,
-  }),
+  public readonly announceStateChangesProperty: BooleanProperty;
 
   /**
    * Whether to announce drag interactions (drag start, drag end, positions)
    */
-  announceDragInteractionsProperty: new BooleanProperty(oscillationsAndChaosQueryParameters.announceDragInteractions, {
-    tandem: Tandem.PREFERENCES.createTandem("audioPreferences").createTandem("announceDragInteractionsProperty"),
-    phetioDocumentation: "Controls voicing announcements for drag interactions with simulation objects",
-    phetioFeatured: true,
-  }),
-};
+  public readonly announceDragInteractionsProperty: BooleanProperty;
 
-// Register the namespace
-OscillationsAndChaosNamespace.register("OscillationsAndChaosPreferences", OscillationsAndChaosPreferences);
+  public constructor(tandem: Tandem = Tandem.PREFERENCES) {
+    const simulationTandem = tandem.createTandem("simulationPreferences");
+    const visualTandem = tandem.createTandem("visualPreferences");
+    const audioTandem = tandem.createTandem("audioPreferences");
 
-export default OscillationsAndChaosPreferences;
+    this.autoPauseWhenTabHiddenProperty = new BooleanProperty(
+      oscillationsAndChaosQueryParameters.autoPauseWhenTabHidden,
+      {
+        tandem: simulationTandem.createTandem("autoPauseWhenTabHiddenProperty"),
+        phetioDocumentation: "Controls whether the simulation automatically pauses when the browser tab becomes hidden",
+        phetioFeatured: true,
+      },
+    );
+
+    this.solverTypeProperty = new EnumerationProperty(
+      SolverType.enumeration.getValue(oscillationsAndChaosQueryParameters.solverType as string),
+      {
+        tandem: simulationTandem.createTandem("solverTypeProperty"),
+        phetioDocumentation: "Selects the numerical integration method used for solving differential equations",
+        phetioFeatured: true,
+      },
+    );
+
+    this.nominalTimeStepProperty = new EnumerationProperty(
+      NominalTimeStep.enumeration.getValue(oscillationsAndChaosQueryParameters.nominalTimeStep as string),
+      {
+        tandem: simulationTandem.createTandem("nominalTimeStepProperty"),
+        phetioDocumentation: "Sets the target time step for numerical integration in seconds",
+        phetioFeatured: true,
+      },
+    );
+
+    this.springVisualizationTypeProperty = new EnumerationProperty(
+      SpringVisualizationType.enumeration.getValue(
+        oscillationsAndChaosQueryParameters.springVisualizationType as string,
+      ),
+      {
+        tandem: simulationTandem.createTandem("springVisualizationTypeProperty"),
+        phetioDocumentation: "Selects the visual style for rendering springs (Classic or Parametric)",
+        phetioFeatured: true,
+      },
+    );
+
+    this.reducedMotionProperty = new BooleanProperty(
+      typeof window !== "undefined" &&
+        window.matchMedia &&
+        window.matchMedia("(prefers-reduced-motion: reduce)").matches,
+      {
+        tandem: visualTandem.createTandem("reducedMotionProperty"),
+        phetioDocumentation: "Respects the user's operating system preference for reduced motion",
+        phetioFeatured: false,
+      },
+    );
+
+    this.highContrastModeProperty = new BooleanProperty(oscillationsAndChaosQueryParameters.highContrastMode, {
+      tandem: visualTandem.createTandem("highContrastModeProperty"),
+      phetioDocumentation: "Enables high contrast mode with enhanced color contrast and focus indicators",
+      phetioFeatured: false,
+    });
+
+    this.announceParameterChangesProperty = new BooleanProperty(
+      oscillationsAndChaosQueryParameters.announceParameterChanges,
+      {
+        tandem: audioTandem.createTandem("announceParameterChangesProperty"),
+        phetioDocumentation:
+          "Controls voicing announcements for parameter changes such as mass, spring constant, and damping",
+        phetioFeatured: true,
+      },
+    );
+
+    this.announceStateChangesProperty = new BooleanProperty(oscillationsAndChaosQueryParameters.announceStateChanges, {
+      tandem: audioTandem.createTandem("announceStateChangesProperty"),
+      phetioDocumentation: "Controls voicing announcements for simulation state changes like play, pause, and reset",
+      phetioFeatured: true,
+    });
+
+    this.announceDragInteractionsProperty = new BooleanProperty(
+      oscillationsAndChaosQueryParameters.announceDragInteractions,
+      {
+        tandem: audioTandem.createTandem("announceDragInteractionsProperty"),
+        phetioDocumentation: "Controls voicing announcements for drag interactions with simulation objects",
+        phetioFeatured: true,
+      },
+    );
+  }
+
+  public reset(): void {
+    this.autoPauseWhenTabHiddenProperty.reset();
+    this.solverTypeProperty.reset();
+    this.nominalTimeStepProperty.reset();
+    this.springVisualizationTypeProperty.reset();
+    this.reducedMotionProperty.reset();
+    this.highContrastModeProperty.reset();
+    this.announceParameterChangesProperty.reset();
+    this.announceStateChangesProperty.reset();
+    this.announceDragInteractionsProperty.reset();
+  }
+}
+
+/** Shared instance read by every screen and the Preferences dialog. */
+export const oscillationsAndChaosPreferences = new OscillationsAndChaosPreferencesModel();
+
+OscillationsAndChaosNamespace.register("OscillationsAndChaosPreferencesModel", OscillationsAndChaosPreferencesModel);

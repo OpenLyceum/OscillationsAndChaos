@@ -10,7 +10,7 @@
 import { voicingUtteranceQueue } from "scenerystack/scenery";
 import { Utterance } from "scenerystack/utterance-queue";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import { GRAPH_CHANGE_ANNOUNCEMENT_DELAY, PARAMETER_CHANGE_ANNOUNCEMENT_DELAY } from "./AccessibilityDelayConstants.js";
 
 /**
@@ -74,7 +74,7 @@ class SimulationAnnouncer {
    * Announce simulation state changes (play/pause/step)
    */
   public announceSimulationState(message: string): void {
-    if (!OscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+    if (!oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
       return;
     }
     this.simulationStateUtterance.alert = message;
@@ -85,7 +85,7 @@ class SimulationAnnouncer {
    * Announce parameter changes (mass, spring constant, damping, etc.)
    */
   public announceParameterChange(message: string): void {
-    if (!OscillationsAndChaosPreferences.announceParameterChangesProperty.value) {
+    if (!oscillationsAndChaosPreferences.announceParameterChangesProperty.value) {
       return;
     }
     this.parameterChangeUtterance.alert = message;
@@ -104,7 +104,7 @@ class SimulationAnnouncer {
    * Announce drag interactions (start, end, position changes)
    */
   public announceDragInteraction(message: string): void {
-    if (!OscillationsAndChaosPreferences.announceDragInteractionsProperty.value) {
+    if (!oscillationsAndChaosPreferences.announceDragInteractionsProperty.value) {
       return;
     }
     this.dragInteractionUtterance.alert = message;

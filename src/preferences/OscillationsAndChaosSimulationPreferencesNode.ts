@@ -17,7 +17,7 @@ import { SpringVisualizationType } from "../common/view/SpringVisualizationType.
 import { StringManager } from "../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "./OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "./OscillationsAndChaosPreferencesModel.js";
 
 export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
   public constructor() {
@@ -35,7 +35,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
       spacing: 8,
       children: [
         new Checkbox(
-          OscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty,
+          oscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty,
           new Text(preferencesLabels.autoPauseWhenTabHiddenStringProperty, {
             font: new PhetFont(16),
             fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
@@ -107,7 +107,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
     ];
 
     const timeStepComboBox = new ComboBox(
-      OscillationsAndChaosPreferences.nominalTimeStepProperty,
+      oscillationsAndChaosPreferences.nominalTimeStepProperty,
       timeStepComboBoxItems,
       comboBoxListParent,
       {
@@ -145,7 +145,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
           fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
         }),
         new VerticalAquaRadioButtonGroup(
-          OscillationsAndChaosPreferences.solverTypeProperty,
+          oscillationsAndChaosPreferences.solverTypeProperty,
           [
             {
               value: SolverType.RK4,
@@ -254,7 +254,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
 
     // Spring visualization preference
     const springVisualizationRadioButtonGroup = new VerticalAquaRadioButtonGroup(
-      OscillationsAndChaosPreferences.springVisualizationTypeProperty,
+      oscillationsAndChaosPreferences.springVisualizationTypeProperty,
       [
         {
           value: SpringVisualizationType.CLASSIC,

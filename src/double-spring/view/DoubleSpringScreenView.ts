@@ -38,7 +38,7 @@ import { VectorNodeFactory } from "../../common/view/VectorNodeFactory.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import OscillationsAndChaosPreferences from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import type { DoubleSpringModel } from "../model/DoubleSpringModel.js";
 import { DoubleSpringPresets } from "../model/DoubleSpringPresets.js";
 import { DoubleSpringScreenSummaryContent } from "./DoubleSpringScreenSummaryContent.js";
@@ -158,7 +158,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
 
     // Set initial spring nodes based on preference
     const useParametric =
-      OscillationsAndChaosPreferences.springVisualizationTypeProperty.value === SpringVisualizationType.PARAMETRIC;
+      oscillationsAndChaosPreferences.springVisualizationTypeProperty.value === SpringVisualizationType.PARAMETRIC;
 
     this.currentSpring1Node = useParametric ? this.parametricSpring1Node : this.classicSpring1Node;
     this.currentSpring2Node = useParametric ? this.parametricSpring2Node : this.classicSpring2Node;
@@ -242,7 +242,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
 
     // Listen to spring visualization preference changes
     // Using lazyLink to avoid triggering during initialization
-    OscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
+    oscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
       this.switchSpringVisualization(springType);
     });
 
