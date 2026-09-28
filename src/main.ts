@@ -77,6 +77,7 @@ onReadyToLaunch(() => {
       },
       audioOptions: {
         supportsVoicing: true,
+        // Voicing only. Leave sound off, and do not set supportsSound in src/init.ts.
         supportsSound: false,
         customPreferences: [
           {
