@@ -156,8 +156,8 @@ onReadyToLaunch(() => {
         supportsDynamicLocale: true,
       },
       audioOptions: {
-        // Voicing only. Leave sound off, and do not set supportsSound in src/init.ts.
-        supportsSound: false,
+        // Voicing only. This sim ships no sound generators, so the sound feature
+        // stays at the framework default (off) and init does not claim otherwise.
         supportsVoicing: true,
         customPreferences: [
           {

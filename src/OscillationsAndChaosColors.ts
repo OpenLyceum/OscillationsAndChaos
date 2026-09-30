@@ -218,6 +218,12 @@ const OscillationsAndChaosColors = {
     default: "#1a1a1a",
     projector: "#1a1a1a",
   }),
+
+  /** Home-screen and navigation-bar icon card. White in both profiles. */
+  screenIconBackgroundColorProperty: new ProfileColorProperty(OscillationsAndChaosNamespace, "screenIconBackground", {
+    default: WHITE,
+    projector: WHITE,
+  }),
 };
 
 export default OscillationsAndChaosColors;

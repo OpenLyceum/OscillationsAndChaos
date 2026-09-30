@@ -145,6 +145,7 @@ export class StringManager {
     newtonMeterSecondsStringProperty: ReadOnlyProperty<string>;
     metersStringProperty: ReadOnlyProperty<string>;
     metersPerSecondSquaredStringProperty: ReadOnlyProperty<string>;
+    degreesPatternStringProperty: ReadOnlyProperty<string>;
   } {
     return {
       kilogramsStringProperty: stringProperties.units.kilogramsStringProperty,
@@ -153,6 +154,7 @@ export class StringManager {
       newtonMeterSecondsStringProperty: stringProperties.units.newtonMeterSecondsStringProperty,
       metersStringProperty: stringProperties.units.metersStringProperty,
       metersPerSecondSquaredStringProperty: stringProperties.units.metersPerSecondSquaredStringProperty,
+      degreesPatternStringProperty: stringProperties.units.degreesPatternStringProperty,
     };
   }
 

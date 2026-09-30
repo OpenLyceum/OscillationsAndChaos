@@ -47,6 +47,7 @@ import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
 import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import type { Preset } from "../model/Preset.js";
+import OscillationsAndChaosHotkeyData from "../OscillationsAndChaosHotkeyData.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 import { GRAPH_LEFT_MARGIN, GRAPH_TO_VECTOR_PANEL_SPACING } from "./DialogAndPanelConstants.js";
 import { FONT_SIZE_BODY_TEXT, FONT_SIZE_SECONDARY_LABEL } from "./FontSizeConstants.js";
@@ -485,7 +486,12 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     // Using global keyboard listener so shortcuts work regardless of focus
     const a11yStrings = this.getA11yStrings();
     KeyboardListener.createGlobal(this, {
-      keys: ["r", "space", "arrowLeft", "arrowRight"],
+      keys: [
+        ...OscillationsAndChaosHotkeyData.RESET_KEYS,
+        ...OscillationsAndChaosHotkeyData.PLAY_PAUSE_KEYS,
+        ...OscillationsAndChaosHotkeyData.STEP_BACKWARD_KEYS,
+        ...OscillationsAndChaosHotkeyData.STEP_FORWARD_KEYS,
+      ],
       fire: (_event, keysPressed) => {
         if (keysPressed === "r") {
           // Reset simulation with R key

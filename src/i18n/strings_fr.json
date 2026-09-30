@@ -40,7 +40,8 @@
     "newtonSecondsPerMeter": "{{value}} N·s/m",
     "newtonMeterSeconds": "{{value}} N·m·s",
     "meters": "{{value}} m",
-    "metersPerSecondSquared": "{{value}} m/s²"
+    "metersPerSecondSquared": "{{value}} m/s²",
+    "degreesPattern": "{{degrees}}°"
   },
   "graph": {
     "showGraph": "Graphique",

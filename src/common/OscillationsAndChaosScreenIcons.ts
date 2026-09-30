@@ -20,14 +20,16 @@ const H = 373;
 const CX = W / 2;
 
 function background(): Rectangle {
-  return new Rectangle(0, 0, W, H, { fill: "#ffffff" });
+  return new Rectangle(0, 0, W, H, {
+    fill: OscillationsAndChaosColors.screenIconBackgroundColorProperty,
+  });
 }
 
 function iconFrom(content: Node): ScreenIcon {
   return new ScreenIcon(content, {
     maxIconWidthProportion: 1,
     maxIconHeightProportion: 1,
-    fill: "#ffffff",
+    fill: OscillationsAndChaosColors.screenIconBackgroundColorProperty,
   });
 }
 

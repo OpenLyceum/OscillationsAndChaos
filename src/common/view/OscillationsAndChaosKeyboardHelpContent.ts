@@ -1,67 +1,52 @@
 /**
  * Keyboard shortcuts help content for Classical Mechanics simulations.
- * Displays available keyboard shortcuts in a two-column layout.
+ * Rows for the global playback listener come from OscillationsAndChaosHotkeyData.
+ * Graph pan is a RichDragListener, documented by the standard move-draggable section.
  */
 
 import {
   KeyboardHelpSection,
   KeyboardHelpSectionRow,
-  TextKeyNode,
+  MoveDraggableItemsKeyboardHelpSection,
   TwoColumnKeyboardHelpContent,
 } from "scenerystack/scenery-phet";
 import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
+import OscillationsAndChaosHotkeyData from "../OscillationsAndChaosHotkeyData.js";
 
 export class OscillationsAndChaosKeyboardHelpContent extends TwoColumnKeyboardHelpContent {
   public constructor() {
-    const stringManager = StringManager.getInstance();
-    const keyboardShortcutsStrings = stringManager.getKeyboardShortcutsStrings();
+    const keyboardShortcutsStrings = StringManager.getInstance().getKeyboardShortcutsStrings();
 
-    // Create sections for simulation controls
+    const playPauseRow = KeyboardHelpSectionRow.fromHotkeyData(OscillationsAndChaosHotkeyData.PLAY_PAUSE, {
+      labelStringProperty: keyboardShortcutsStrings.playPauseSimulationStringProperty,
+      pdomLabelStringProperty: keyboardShortcutsStrings.playPauseSimulationStringProperty,
+    });
+    const resetRow = KeyboardHelpSectionRow.fromHotkeyData(OscillationsAndChaosHotkeyData.RESET, {
+      labelStringProperty: keyboardShortcutsStrings.resetSimulationStringProperty,
+      pdomLabelStringProperty: keyboardShortcutsStrings.resetSimulationStringProperty,
+    });
+    const stepBackwardRow = KeyboardHelpSectionRow.fromHotkeyData(OscillationsAndChaosHotkeyData.STEP_BACKWARD, {
+      labelStringProperty: keyboardShortcutsStrings.stepBackwardStringProperty,
+      pdomLabelStringProperty: keyboardShortcutsStrings.stepBackwardStringProperty,
+    });
+    const stepForwardRow = KeyboardHelpSectionRow.fromHotkeyData(OscillationsAndChaosHotkeyData.STEP_FORWARD, {
+      labelStringProperty: keyboardShortcutsStrings.stepForwardStringProperty,
+      pdomLabelStringProperty: keyboardShortcutsStrings.stepForwardStringProperty,
+    });
+
     const simulationControlsSection = new KeyboardHelpSection(
       keyboardShortcutsStrings.simulationControlsStringProperty,
-      [
-        KeyboardHelpSectionRow.labelWithIcon(
-          keyboardShortcutsStrings.playPauseSimulationStringProperty,
-          TextKeyNode.space(),
-        ),
-        KeyboardHelpSectionRow.labelWithIcon(
-          keyboardShortcutsStrings.resetSimulationStringProperty,
-          new TextKeyNode("R"),
-        ),
-        KeyboardHelpSectionRow.labelWithIcon(
-          keyboardShortcutsStrings.stepBackwardStringProperty,
-          new TextKeyNode("\u2190"), // Left arrow
-        ),
-        KeyboardHelpSectionRow.labelWithIcon(
-          keyboardShortcutsStrings.stepForwardStringProperty,
-          new TextKeyNode("\u2192"), // Right arrow
-        ),
-      ],
+      [playPauseRow, resetRow, stepBackwardRow, stepForwardRow],
     );
 
-    // Create sections for graph interactions
-    const graphInteractionsSection = new KeyboardHelpSection(keyboardShortcutsStrings.graphInteractionsStringProperty, [
-      KeyboardHelpSectionRow.labelWithIcon(
-        keyboardShortcutsStrings.resetZoomStringProperty,
-        new TextKeyNode("Double-click"),
-      ),
-      KeyboardHelpSectionRow.labelWithIcon(
-        keyboardShortcutsStrings.zoomInOutStringProperty,
-        new TextKeyNode("Mouse wheel"),
-      ),
-      KeyboardHelpSectionRow.labelWithIcon(keyboardShortcutsStrings.panViewStringProperty, new TextKeyNode("Drag")),
-    ]);
-
-    // Left column has simulation controls, right column has graph interactions
-    super([simulationControlsSection], [graphInteractionsSection], {
+    super([simulationControlsSection], [new MoveDraggableItemsKeyboardHelpSection()], {
       columnSpacing: 20,
       sectionSpacing: 15,
     });
   }
 }
 
-// Register with namespace for debugging accessibility
 OscillationsAndChaosNamespace.register(
   "OscillationsAndChaosKeyboardHelpContent",
   OscillationsAndChaosKeyboardHelpContent,

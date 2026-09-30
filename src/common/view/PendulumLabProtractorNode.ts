@@ -7,11 +7,12 @@
  */
 
 import { PhetFont, StringUtils } from "scenerystack";
-import type { TReadOnlyProperty } from "scenerystack/axon";
+import { PatternStringProperty, StringProperty, type TReadOnlyProperty } from "scenerystack/axon";
 import { Vector2 } from "scenerystack/dot";
 import { Shape } from "scenerystack/kite";
 import type { ModelViewTransform2 } from "scenerystack/phetcommon";
 import { Circle, Line, Node, Path, Text } from "scenerystack/scenery";
+import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
 
@@ -122,19 +123,28 @@ export class PendulumLabProtractorNode extends Node {
     };
 
     // Create text to display the angle in degrees
-    const degreesText = new Text("0°", {
+    const degreesDigitsProperty = new StringProperty("0");
+    const degreesLabelProperty = new PatternStringProperty(
+      StringManager.getInstance().getUnitStrings().degreesPatternStringProperty,
+      { degrees: degreesDigitsProperty },
+    );
+    const degreesText = new Text(degreesLabelProperty, {
       centerY: 15,
       font: new PhetFont({ size: 14 }),
       fill: pendulumColorProperty,
     });
     degreesLayer.addChild(degreesText);
+    this.disposeEmitter.addListener(() => {
+      degreesLabelProperty.dispose();
+      degreesDigitsProperty.dispose();
+    });
 
     // Function to update the degrees text
     const updateDegreesText = () => {
       const angle = pendulumData.angleProperty.value;
       const degrees = (angle * 180) / Math.PI;
 
-      degreesText.string = `${StringUtils.toFixedNumberLTR(Math.abs(degrees), 0)}°`;
+      degreesDigitsProperty.value = StringUtils.toFixedNumberLTR(Math.abs(degrees), 0);
 
       // Position text based on which side of vertical the pendulum is on
       if (angle < 0) {
