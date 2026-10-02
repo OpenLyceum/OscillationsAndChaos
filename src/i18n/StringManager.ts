@@ -170,6 +170,9 @@ export class StringManager {
     line2StringProperty: ReadOnlyProperty<string>;
     line3StringProperty: ReadOnlyProperty<string>;
     angleAndVelocityStringProperty: ReadOnlyProperty<string>;
+    titleOpenStringProperty: ReadOnlyProperty<string>;
+    titleVsStringProperty: ReadOnlyProperty<string>;
+    titleCloseStringProperty: ReadOnlyProperty<string>;
   } {
     return {
       // Graph controls
@@ -190,6 +193,11 @@ export class StringManager {
 
       // Pendulum-specific labels
       angleAndVelocityStringProperty: stringProperties.graph.pendulum.angleAndVelocityStringProperty,
+
+      // "(Y vs X)" title around the axis combo boxes
+      titleOpenStringProperty: stringProperties.graph.titleOpenStringProperty,
+      titleVsStringProperty: stringProperties.graph.titleVsStringProperty,
+      titleCloseStringProperty: stringProperties.graph.titleCloseStringProperty,
     };
   }
 

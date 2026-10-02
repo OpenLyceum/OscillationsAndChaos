@@ -97,17 +97,19 @@ export class GraphControlsPanel {
     });
 
     // Create title in format "(Y vs X)"
-    const leftParen = new Text("(", {
+    const graphLabels = StringManager.getInstance().getGraphLabels();
+    const leftParen = new Text(graphLabels.titleOpenStringProperty, {
       font: new PhetFont({ size: 14 }),
       fill: OscillationsAndChaosColors.textColorProperty,
     });
 
-    const vsText = new Text(" vs ", {
+    const vsText = new Text(graphLabels.titleVsStringProperty, {
+      layoutOptions: { leftMargin: 3, rightMargin: 3 },
       font: new PhetFont({ size: 14 }),
       fill: OscillationsAndChaosColors.textColorProperty,
     });
 
-    const rightParen = new Text(")", {
+    const rightParen = new Text(graphLabels.titleCloseStringProperty, {
       font: new PhetFont({ size: 14 }),
       fill: OscillationsAndChaosColors.textColorProperty,
     });

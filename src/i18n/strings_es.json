@@ -86,7 +86,10 @@
       "gravitationalPotentialEnergy": "Energía potencial (gravedad)",
       "totalEnergy": "Energía total",
       "time": "Tiempo"
-    }
+    },
+    "titleOpen": "(",
+    "titleVs": "vs",
+    "titleClose": ")"
   },
   "timeControls": {
     "autoPauseWhenTabHidden": "Pausar automáticamente cuando la pestaña está oculta"
