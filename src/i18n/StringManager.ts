@@ -538,9 +538,19 @@ export class StringManager {
     upperBobReleasedAtStringProperty: ReadOnlyProperty<string>;
     lowerBobReleasedAtStringProperty: ReadOnlyProperty<string>;
     massChangedStringProperty: ReadOnlyProperty<string>;
+    mass1ChangedStringProperty: ReadOnlyProperty<string>;
+    mass2ChangedStringProperty: ReadOnlyProperty<string>;
     springConstantChangedStringProperty: ReadOnlyProperty<string>;
+    springConstant1ChangedStringProperty: ReadOnlyProperty<string>;
+    springConstant2ChangedStringProperty: ReadOnlyProperty<string>;
     dampingChangedStringProperty: ReadOnlyProperty<string>;
+    damping1ChangedStringProperty: ReadOnlyProperty<string>;
+    damping2ChangedStringProperty: ReadOnlyProperty<string>;
     lengthChangedStringProperty: ReadOnlyProperty<string>;
+    upperLengthChangedStringProperty: ReadOnlyProperty<string>;
+    lowerLengthChangedStringProperty: ReadOnlyProperty<string>;
+    upperMassChangedStringProperty: ReadOnlyProperty<string>;
+    lowerMassChangedStringProperty: ReadOnlyProperty<string>;
     gravityChangedStringProperty: ReadOnlyProperty<string>;
     presetAppliedStringProperty: ReadOnlyProperty<string>;
     graphShownStringProperty: ReadOnlyProperty<string>;
@@ -590,9 +600,19 @@ export class StringManager {
 
       // Parameter changes
       massChangedStringProperty: stringProperties.a11y.parameters.massChangedStringProperty,
+      mass1ChangedStringProperty: stringProperties.a11y.parameters.mass1ChangedStringProperty,
+      mass2ChangedStringProperty: stringProperties.a11y.parameters.mass2ChangedStringProperty,
       springConstantChangedStringProperty: stringProperties.a11y.parameters.springConstantChangedStringProperty,
+      springConstant1ChangedStringProperty: stringProperties.a11y.parameters.springConstant1ChangedStringProperty,
+      springConstant2ChangedStringProperty: stringProperties.a11y.parameters.springConstant2ChangedStringProperty,
       dampingChangedStringProperty: stringProperties.a11y.parameters.dampingChangedStringProperty,
+      damping1ChangedStringProperty: stringProperties.a11y.parameters.damping1ChangedStringProperty,
+      damping2ChangedStringProperty: stringProperties.a11y.parameters.damping2ChangedStringProperty,
       lengthChangedStringProperty: stringProperties.a11y.parameters.lengthChangedStringProperty,
+      upperLengthChangedStringProperty: stringProperties.a11y.parameters.upperLengthChangedStringProperty,
+      lowerLengthChangedStringProperty: stringProperties.a11y.parameters.lowerLengthChangedStringProperty,
+      upperMassChangedStringProperty: stringProperties.a11y.parameters.upperMassChangedStringProperty,
+      lowerMassChangedStringProperty: stringProperties.a11y.parameters.lowerMassChangedStringProperty,
       gravityChangedStringProperty: stringProperties.a11y.parameters.gravityChangedStringProperty,
       presetAppliedStringProperty: stringProperties.a11y.parameters.presetAppliedStringProperty,
 

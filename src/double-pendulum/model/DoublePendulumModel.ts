@@ -20,6 +20,46 @@ import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
 
+/**
+ * Angular accelerations for the coupled system in `doc/model.md`.
+ *
+ * One shared damping coefficient is applied as b₁ = b₂ = b on the torque
+ * right-hand sides, then the 2×2 system is solved for α₁ and α₂.
+ * δ = θ₁ − θ₂.
+ */
+function angularAccelerations(
+  theta1: number,
+  theta2: number,
+  omega1: number,
+  omega2: number,
+  m1: number,
+  m2: number,
+  length1: number,
+  length2: number,
+  gravity: number,
+  damping: number,
+): readonly [number, number] {
+  const delta = theta1 - theta2;
+  const cosDelta = Math.cos(delta);
+  const sinDelta = Math.sin(delta);
+
+  const inertia11 = (m1 + m2) * length1 * length1;
+  const inertia12 = m2 * length1 * length2 * cosDelta;
+  const inertia22 = m2 * length2 * length2;
+
+  const torque1 =
+    -(m1 + m2) * gravity * length1 * Math.sin(theta1) -
+    damping * omega1 -
+    m2 * length1 * length2 * omega2 * omega2 * sinDelta;
+  const torque2 =
+    -m2 * gravity * length2 * Math.sin(theta2) - damping * omega2 + m2 * length1 * length2 * omega1 * omega1 * sinDelta;
+
+  const determinant = inertia11 * inertia22 - inertia12 * inertia12;
+  const alpha1 = (torque1 * inertia22 - inertia12 * torque2) / determinant;
+  const alpha2 = (inertia11 * torque2 - torque1 * inertia12) / determinant;
+  return [alpha1, alpha2];
+}
+
 export class DoublePendulumModel extends BaseModel {
   // State variables
   public readonly angle1Property: NumberProperty;
@@ -97,19 +137,8 @@ export class DoublePendulumModel extends BaseModel {
         this.gravityProperty,
         this.dampingProperty,
       ],
-      (theta1, theta2, omega1, omega2, m1, m2, L1, L2, g, b) => {
-        const delta = theta2 - theta1;
-        const cosDelta = Math.cos(delta);
-        const sinDelta = Math.sin(delta);
-        const denom1 = (m1 + m2) * L1 - m2 * L1 * cosDelta * cosDelta;
-        const num1 =
-          m2 * L1 * omega1 * omega1 * sinDelta * cosDelta +
-          m2 * g * Math.sin(theta2) * cosDelta +
-          m2 * L2 * omega2 * omega2 * sinDelta -
-          (m1 + m2) * g * Math.sin(theta1) -
-          b * omega1;
-        return num1 / denom1;
-      },
+      (theta1, theta2, omega1, omega2, m1, m2, L1, L2, g, b) =>
+        angularAccelerations(theta1, theta2, omega1, omega2, m1, m2, L1, L2, g, b)[0],
     );
 
     this.angularAcceleration2Property = new DerivedProperty(
@@ -125,20 +154,8 @@ export class DoublePendulumModel extends BaseModel {
         this.gravityProperty,
         this.dampingProperty,
       ],
-      (theta1, theta2, omega1, omega2, m1, m2, L1, L2, g, b) => {
-        const delta = theta2 - theta1;
-        const cosDelta = Math.cos(delta);
-        const sinDelta = Math.sin(delta);
-        const denom1 = (m1 + m2) * L1 - m2 * L1 * cosDelta * cosDelta;
-        const denom2 = (L2 / L1) * denom1;
-        const num2 =
-          -m2 * L2 * omega2 * omega2 * sinDelta * cosDelta +
-          (m1 + m2) * g * Math.sin(theta1) * cosDelta -
-          (m1 + m2) * L1 * omega1 * omega1 * sinDelta -
-          (m1 + m2) * g * Math.sin(theta2) -
-          b * omega2;
-        return num2 / denom2;
-      },
+      (theta1, theta2, omega1, omega2, m1, m2, L1, L2, g, b) =>
+        angularAccelerations(theta1, theta2, omega1, omega2, m1, m2, L1, L2, g, b)[1],
     );
 
     // Compute kinetic energy (complex due to coupling between pendulums)
@@ -162,9 +179,10 @@ export class DoublePendulumModel extends BaseModel {
       },
     );
 
-    // Compute potential energy
-    // PE = (m1 + m2) * g * y1 + m2 * g * y2
-    // where y1 = -L1 * cos(θ1) and y2 = y1 - L2 * cos(θ2)
+    // PE = m1 g y1 + m2 g y2, with y measured up from the pivot:
+    // y1 = −L1 cos θ1, y2 = y1 − L2 cos θ2.
+    // That is −(m1+m2) g L1 cos θ1 − m2 g L2 cos θ2. Adding (m1+m2) g y1
+    // on top of the absolute y2 would count the lower mass's share of y1 twice.
     this.potentialEnergyProperty = new DerivedProperty(
       [
         this.angle1Property,
@@ -175,11 +193,7 @@ export class DoublePendulumModel extends BaseModel {
         this.length2Property,
         this.gravityProperty,
       ],
-      (theta1, theta2, m1, m2, L1, L2, g) => {
-        const y1 = -L1 * Math.cos(theta1);
-        const y2 = y1 - L2 * Math.cos(theta2);
-        return (m1 + m2) * g * y1 + m2 * g * y2;
-      },
+      (theta1, theta2, m1, m2, L1, L2, g) => -(m1 + m2) * g * L1 * Math.cos(theta1) - m2 * g * L2 * Math.cos(theta2),
     );
 
     // Total energy = KE + PE
@@ -230,39 +244,12 @@ export class DoublePendulumModel extends BaseModel {
     const g = this.gravityProperty.value;
     const b = this.dampingProperty.value;
 
-    const delta = theta2 - theta1;
-    const cosDelta = Math.cos(delta);
-    const sinDelta = Math.sin(delta);
+    const [alpha1, alpha2] = angularAccelerations(theta1, theta2, omega1, omega2, m1, m2, L1, L2, g, b);
 
-    // Denominators for the angular accelerations
-    const denom1 = (m1 + m2) * L1 - m2 * L1 * cosDelta * cosDelta;
-    const denom2 = (L2 / L1) * denom1;
-
-    // dθ1/dt = ω1
     derivatives[0]! = omega1;
-
-    // dω1/dt (angular acceleration of first pendulum)
-    const num1 =
-      m2 * L1 * omega1 * omega1 * sinDelta * cosDelta +
-      m2 * g * Math.sin(theta2) * cosDelta +
-      m2 * L2 * omega2 * omega2 * sinDelta -
-      (m1 + m2) * g * Math.sin(theta1) -
-      b * omega1;
-
-    derivatives[1]! = num1 / denom1;
-
-    // dθ2/dt = ω2
+    derivatives[1]! = alpha1;
     derivatives[2]! = omega2;
-
-    // dω2/dt (angular acceleration of second pendulum)
-    const num2 =
-      -m2 * L2 * omega2 * omega2 * sinDelta * cosDelta +
-      (m1 + m2) * g * Math.sin(theta1) * cosDelta -
-      (m1 + m2) * L1 * omega1 * omega1 * sinDelta -
-      (m1 + m2) * g * Math.sin(theta2) -
-      b * omega2;
-
-    derivatives[3]! = num2 / denom2;
+    derivatives[3]! = alpha2;
   }
 
   /**

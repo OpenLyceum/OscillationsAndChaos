@@ -406,35 +406,28 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.model.dampingProperty.lazyLink(detectCustomChange);
 
     // Add accessibility announcements for parameter changes
+    const announce = (template: string, value: number, decimalPlaces: number) => {
+      SimulationAnnouncer.announceParameterChange(
+        StringUtils.fillIn(template, { value: StringUtils.toFixedNumberLTR(value, decimalPlaces) }),
+      );
+    };
     this.model.length1Property.lazyLink((length) => {
-      const template = this.a11yStrings.lengthChangedStringProperty.value;
-      const announcement = `Upper pendulum: ${template.replace("{{value}}", StringUtils.toFixedNumberLTR(length, 1))}`;
-      SimulationAnnouncer.announceParameterChange(announcement);
+      announce(this.a11yStrings.upperLengthChangedStringProperty.value, length, 1);
     });
     this.model.length2Property.lazyLink((length) => {
-      const template = this.a11yStrings.lengthChangedStringProperty.value;
-      const announcement = `Lower pendulum: ${template.replace("{{value}}", StringUtils.toFixedNumberLTR(length, 1))}`;
-      SimulationAnnouncer.announceParameterChange(announcement);
+      announce(this.a11yStrings.lowerLengthChangedStringProperty.value, length, 1);
     });
     this.model.mass1Property.lazyLink((mass) => {
-      const template = this.a11yStrings.massChangedStringProperty.value;
-      const announcement = `Upper bob: ${template.replace("{{value}}", StringUtils.toFixedNumberLTR(mass, 1))}`;
-      SimulationAnnouncer.announceParameterChange(announcement);
+      announce(this.a11yStrings.upperMassChangedStringProperty.value, mass, 1);
     });
     this.model.mass2Property.lazyLink((mass) => {
-      const template = this.a11yStrings.massChangedStringProperty.value;
-      const announcement = `Lower bob: ${template.replace("{{value}}", StringUtils.toFixedNumberLTR(mass, 1))}`;
-      SimulationAnnouncer.announceParameterChange(announcement);
+      announce(this.a11yStrings.lowerMassChangedStringProperty.value, mass, 1);
     });
     this.model.gravityProperty.lazyLink((gravity) => {
-      const template = this.a11yStrings.gravityChangedStringProperty.value;
-      const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(gravity, 1));
-      SimulationAnnouncer.announceParameterChange(announcement);
+      announce(this.a11yStrings.gravityChangedStringProperty.value, gravity, 1);
     });
     this.model.dampingProperty.lazyLink((damping) => {
-      const template = this.a11yStrings.dampingChangedStringProperty.value;
-      const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(damping, 2));
-      SimulationAnnouncer.announceParameterChange(announcement);
+      announce(this.a11yStrings.dampingChangedStringProperty.value, damping, 2);
     });
 
     // Apply the first preset immediately

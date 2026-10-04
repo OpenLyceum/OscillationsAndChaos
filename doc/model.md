@@ -88,7 +88,7 @@ m₂L₂²α₂ + m₂L₁L₂α₁ cos(θ₁−θ₂) − m₂L₁L₂ω₁² s
 **Chaos:** deterministic but sensitive to initial conditions; the second bob's trail shows
 non-repeating paths for generic starts.
 
-**Parameter ranges:** each mass 0.1–5.0 kg; each length 0.5–5.0 m; each damping 0–2 N·m·s.
+**Parameter ranges:** each mass 0.1–5.0 kg; each length 0.5–5.0 m. One shared damping coefficient b = b₁ = b₂, from 0–2 N·m·s, is applied to both rods. The integrator solves the system above for α₁ and α₂.
 
 **Energy:** coupled KE includes m₂L₁L₂ω₁ω₂ cos(θ₁−θ₂); PE = −(m₁+m₂)gL₁ cos θ₁ − m₂gL₂ cos θ₂.
 
