@@ -38,7 +38,10 @@ export abstract class BaseModel {
   // Physics solver (can be swapped based on preference)
   protected solver: ODESolver;
 
-  protected constructor() {
+  private readonly supportsPEFRL: boolean;
+
+  protected constructor(supportsPEFRL: boolean = true) {
+    this.supportsPEFRL = supportsPEFRL;
     // Initialize time control properties
     this.timeProperty = new NumberProperty(0.0);
 
@@ -71,7 +74,8 @@ export abstract class BaseModel {
     } else if (solverType === SolverType.ADAPTIVE_RK45) {
       solver = new AdaptiveRK45Solver();
     } else if (solverType === SolverType.FOREST_RUTH_PEFRL) {
-      solver = new ForestRuthPEFRLSolver();
+      // PEFRL requires separable position/velocity dynamics.
+      solver = this.supportsPEFRL ? new ForestRuthPEFRLSolver() : new RungeKuttaSolver();
     } else if (solverType === SolverType.DORMAND_PRINCE_87) {
       solver = new DormandPrince87Solver();
     } else {

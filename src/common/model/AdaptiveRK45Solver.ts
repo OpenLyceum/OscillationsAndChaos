@@ -213,12 +213,13 @@ export class AdaptiveRK45Solver implements ODESolver {
     assert?.(Number.isFinite(dt) && dt !== 0, "dt must be finite and non-zero");
 
     let currentTime = time;
-    let remainingTime = dt;
-    let currentStepSize = Math.min(this.fixedTimeStep, dt);
+    const direction = Math.sign(dt);
+    let remainingTime = Math.abs(dt);
+    let currentStepSize = Math.min(this.fixedTimeStep, remainingTime);
 
     while (remainingTime > 0) {
       // Try a step
-      const result = this.stepOnce(state, derivativeFn, currentTime, currentStepSize);
+      const result = this.stepOnce(state, derivativeFn, currentTime, direction * currentStepSize);
 
       // Check if error is acceptable
       if (result.error < this.tolerance || currentStepSize <= this.minStepSize) {
@@ -226,7 +227,7 @@ export class AdaptiveRK45Solver implements ODESolver {
         for (let i = 0; i < state.length; i++) {
           state[i]! = result.newState[i]!;
         }
-        currentTime += currentStepSize;
+        currentTime += direction * currentStepSize;
         remainingTime -= currentStepSize;
 
         // Increase step size for next iteration if error is very small

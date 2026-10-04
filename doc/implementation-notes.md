@@ -93,3 +93,10 @@ register in `main.ts`, add locale keys and `StringManager` getters. See [Scenery
 
 Additional structure notes live in `src/doc/PROJECT_STRUCTURE.md` and
 `src/doc/SCENERYSTACK_PATTERNS.md` (not shipped to educators).
+
+### Solver compatibility
+
+All solvers use interleaved state vectors: `[position1, velocity1, position2, velocity2, ...]`.
+Forward and backward integration subdivide the interval using its magnitude and apply its sign to each substep.
+When PEFRL is selected, the double pendulum uses RK4 at the nominal timestep instead: its velocity-dependent
+coupling is not compatible with the separable position/velocity splitting required by PEFRL.

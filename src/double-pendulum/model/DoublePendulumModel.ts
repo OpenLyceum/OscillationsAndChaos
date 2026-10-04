@@ -86,7 +86,9 @@ export class DoublePendulumModel extends BaseModel {
   public readonly totalEnergyProperty: TReadOnlyProperty<number>;
 
   public constructor() {
-    super();
+    // Coupled angular accelerations depend on velocity even without damping,
+    // so the separable PEFRL integrator cannot be used for this system.
+    super(false);
 
     // Initialize state (both start at 90 degrees). No Range: chaotic looping must
     // be allowed to pass ±π; a finite range would clamp and freeze the motion.

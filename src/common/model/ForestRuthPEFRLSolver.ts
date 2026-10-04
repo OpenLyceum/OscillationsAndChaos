@@ -76,7 +76,7 @@ export class ForestRuthPEFRLSolver implements ODESolver {
 
   /**
    * Perform one step of PEFRL integration.
-   * This method assumes the state vector is organized as [positions..., velocities...]
+   * This method assumes the state vector is organized as [position1, velocity1, position2, velocity2, ...]
    * for proper symplectic integration.
    *
    * Important: State vector must have even length (half positions, half velocities)
@@ -116,56 +116,56 @@ export class ForestRuthPEFRLSolver implements ODESolver {
     // Stage 1: Position update with ξ
     derivativeFn(this.tempState, this.derivatives, time);
     for (let i = 0; i < halfN; i++) {
-      this.tempState[i]! += ForestRuthPEFRLSolver.XI * dt * this.derivatives[i]!;
+      this.tempState[2 * i]! += ForestRuthPEFRLSolver.XI * dt * this.derivatives[2 * i]!;
     }
 
     // Stage 2: Velocity update with (1 - 2λ)/2
     derivativeFn(this.tempState, this.derivatives, time + ForestRuthPEFRLSolver.XI * dt);
     const coeff1 = (1 - 2 * ForestRuthPEFRLSolver.LAMBDA) / 2;
     for (let i = 0; i < halfN; i++) {
-      this.tempState[halfN + i]! += coeff1 * dt * this.derivatives[halfN + i]!;
+      this.tempState[2 * i + 1]! += coeff1 * dt * this.derivatives[2 * i + 1]!;
     }
 
     // Stage 3: Position update with χ
     for (let i = 0; i < halfN; i++) {
-      this.tempState[i]! += ForestRuthPEFRLSolver.CHI * dt * this.tempState[halfN + i]!;
+      this.tempState[2 * i]! += ForestRuthPEFRLSolver.CHI * dt * this.tempState[2 * i + 1]!;
     }
 
     // Stage 4: Velocity update with λ
     const time2 = time + (ForestRuthPEFRLSolver.XI + ForestRuthPEFRLSolver.CHI) * dt;
     derivativeFn(this.tempState, this.derivatives, time2);
     for (let i = 0; i < halfN; i++) {
-      this.tempState[halfN + i]! += ForestRuthPEFRLSolver.LAMBDA * dt * this.derivatives[halfN + i]!;
+      this.tempState[2 * i + 1]! += ForestRuthPEFRLSolver.LAMBDA * dt * this.derivatives[2 * i + 1]!;
     }
 
     // Stage 5: Position update with (1 - 2(χ + ξ))
     const coeff2 = 1 - 2 * (ForestRuthPEFRLSolver.CHI + ForestRuthPEFRLSolver.XI);
     for (let i = 0; i < halfN; i++) {
-      this.tempState[i]! += coeff2 * dt * this.tempState[halfN + i]!;
+      this.tempState[2 * i]! += coeff2 * dt * this.tempState[2 * i + 1]!;
     }
 
     // Stage 6: Velocity update with λ
     const time3 = time + (1 - ForestRuthPEFRLSolver.CHI - ForestRuthPEFRLSolver.XI) * dt;
     derivativeFn(this.tempState, this.derivatives, time3);
     for (let i = 0; i < halfN; i++) {
-      this.tempState[halfN + i]! += ForestRuthPEFRLSolver.LAMBDA * dt * this.derivatives[halfN + i]!;
+      this.tempState[2 * i + 1]! += ForestRuthPEFRLSolver.LAMBDA * dt * this.derivatives[2 * i + 1]!;
     }
 
     // Stage 7: Position update with χ
     for (let i = 0; i < halfN; i++) {
-      this.tempState[i]! += ForestRuthPEFRLSolver.CHI * dt * this.tempState[halfN + i]!;
+      this.tempState[2 * i]! += ForestRuthPEFRLSolver.CHI * dt * this.tempState[2 * i + 1]!;
     }
 
     // Stage 8: Velocity update with (1 - 2λ)/2
     const time4 = time + (1 - ForestRuthPEFRLSolver.XI) * dt;
     derivativeFn(this.tempState, this.derivatives, time4);
     for (let i = 0; i < halfN; i++) {
-      this.tempState[halfN + i]! += coeff1 * dt * this.derivatives[halfN + i]!;
+      this.tempState[2 * i + 1]! += coeff1 * dt * this.derivatives[2 * i + 1]!;
     }
 
     // Stage 9: Final position update with ξ
     for (let i = 0; i < halfN; i++) {
-      this.tempState[i]! += ForestRuthPEFRLSolver.XI * dt * this.tempState[halfN + i]!;
+      this.tempState[2 * i]! += ForestRuthPEFRLSolver.XI * dt * this.tempState[2 * i + 1]!;
     }
 
     // Copy result back to state
@@ -182,7 +182,7 @@ export class ForestRuthPEFRLSolver implements ODESolver {
    * consistent step sizes.
    *
    * @param state - Current state vector (will be modified in place)
-   *                 Must be organized as [positions..., velocities...]
+   *                 Must be organized as [position1, velocity1, position2, velocity2, ...]
    * @param derivativeFn - Function that computes derivatives
    * @param time - Current time
    * @param dt - Requested time step (can be larger than fixedTimeStep)
@@ -200,19 +200,20 @@ export class ForestRuthPEFRLSolver implements ODESolver {
     assert?.(Number.isFinite(dt) && dt !== 0, "dt must be finite and non-zero");
 
     // Handle the case where dt is smaller than or equal to fixedTimeStep
-    if (dt <= this.fixedTimeStep) {
+    if (Math.abs(dt) <= this.fixedTimeStep) {
       this.stepOnce(state, derivativeFn, time, dt);
       return time + dt;
     }
 
     // Take multiple fixed steps to cover the requested time interval
-    let remainingTime = dt;
+    const direction = Math.sign(dt);
+    let remainingTime = Math.abs(dt);
     let currentTime = time;
 
     while (remainingTime > 0) {
       const stepSize = Math.min(this.fixedTimeStep, remainingTime);
-      this.stepOnce(state, derivativeFn, currentTime, stepSize);
-      currentTime += stepSize;
+      this.stepOnce(state, derivativeFn, currentTime, direction * stepSize);
+      currentTime += direction * stepSize;
       remainingTime -= stepSize;
     }
 

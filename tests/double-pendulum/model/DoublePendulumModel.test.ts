@@ -1,5 +1,7 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { SolverType } from "../../../src/common/model/SolverType.js";
 import { DoublePendulumModel } from "../../../src/double-pendulum/model/DoublePendulumModel.js";
+import { oscillationsAndChaosPreferences } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 
 /**
  * Independent solution of the coupled system in doc/model.md, with b₁ = b₂ = b.
@@ -41,6 +43,7 @@ describe("DoublePendulumModel", () => {
 
   afterEach(() => {
     model.reset();
+    oscillationsAndChaosPreferences.solverTypeProperty.reset();
   });
 
   it("uses the documented potential energy, without counting the lower mass twice", () => {
@@ -93,5 +96,37 @@ describe("DoublePendulumModel", () => {
     model.step(1e-4, true);
 
     expect(model.angularVelocity1Property.value).toBeLessThan(0);
+  });
+
+  it("uses RK4 for nonseparable dynamics when PEFRL is selected or hot-swapped", () => {
+    oscillationsAndChaosPreferences.solverTypeProperty.value = SolverType.FOREST_RUTH_PEFRL;
+    model = new DoublePendulumModel();
+    model.step(0.08, true);
+    const pefrlSelectedState = [
+      model.angle1Property.value,
+      model.angularVelocity1Property.value,
+      model.angle2Property.value,
+      model.angularVelocity2Property.value,
+    ];
+
+    model.reset();
+    oscillationsAndChaosPreferences.solverTypeProperty.value = SolverType.RK4;
+    model.step(0.08, true);
+    expect([
+      model.angle1Property.value,
+      model.angularVelocity1Property.value,
+      model.angle2Property.value,
+      model.angularVelocity2Property.value,
+    ]).toEqual(pefrlSelectedState);
+
+    model.reset();
+    oscillationsAndChaosPreferences.solverTypeProperty.value = SolverType.FOREST_RUTH_PEFRL;
+    model.step(0.08, true);
+    expect([
+      model.angle1Property.value,
+      model.angularVelocity1Property.value,
+      model.angle2Property.value,
+      model.angularVelocity2Property.value,
+    ]).toEqual(pefrlSelectedState);
   });
 });

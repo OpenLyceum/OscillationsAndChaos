@@ -117,19 +117,20 @@ export class RungeKuttaSolver implements ODESolver {
    */
   public step(state: number[], derivativeFn: DerivativeFunction, time: number, dt: number): number {
     // Handle the case where dt is smaller than or equal to fixedTimeStep
-    if (dt <= this.fixedTimeStep) {
+    if (Math.abs(dt) <= this.fixedTimeStep) {
       this.stepOnce(state, derivativeFn, time, dt);
       return time + dt;
     }
 
     // Take multiple fixed steps to cover the requested time interval
-    let remainingTime = dt;
+    const direction = Math.sign(dt);
+    let remainingTime = Math.abs(dt);
     let currentTime = time;
 
     while (remainingTime > 0) {
       const stepSize = Math.min(this.fixedTimeStep, remainingTime);
-      this.stepOnce(state, derivativeFn, currentTime, stepSize);
-      currentTime += stepSize;
+      this.stepOnce(state, derivativeFn, currentTime, direction * stepSize);
+      currentTime += direction * stepSize;
       remainingTime -= stepSize;
     }
 
