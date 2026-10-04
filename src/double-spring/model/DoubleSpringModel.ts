@@ -153,6 +153,20 @@ export class DoubleSpringModel extends BaseModel {
     return this.damping1Property.value === 0 && this.damping2Property.value === 0;
   }
 
+  protected getHistoryParameters(): NumberProperty[] {
+    return [
+      this.mass1Property,
+      this.mass2Property,
+      this.springConstant1Property,
+      this.springConstant2Property,
+      this.damping1Property,
+      this.damping2Property,
+      this.gravityProperty,
+      this.naturalLength1Property,
+      this.naturalLength2Property,
+    ];
+  }
+
   /**
    * Get the current state vector for physics integration.
    * @returns [position1, velocity1, position2, velocity2]

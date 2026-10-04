@@ -57,6 +57,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
   private readonly trailPath: Path;
   private readonly pivotPoint: Vector2;
   private readonly trailPoints: Vector2[] = [];
+  private readonly trailTimes: number[] = [];
   private readonly maxTrailPoints: number = 500;
   private readonly trailVisibleProperty: BooleanProperty;
   protected override readonly presetProperty: Property<PresetOption>;
@@ -734,18 +735,31 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
 
     this.rod2Node.setLine(bob1ViewPos.x, bob1ViewPos.y, bob2ViewPos.x, bob2ViewPos.y);
 
-    // Update trail (track second bob for chaotic motion visualization)
-    this.addTrailPoint(bob2ViewPos);
+    // Render-only updates (including paused frames) must not age the trail.
+    const time = this.model.timeProperty.value;
+    const lastTime = this.trailTimes[this.trailTimes.length - 1];
+    if (lastTime !== undefined && time < lastTime) {
+      while (this.trailTimes.length > 0 && this.trailTimes[this.trailTimes.length - 1]! >= time) {
+        this.trailTimes.pop();
+        this.trailPoints.pop();
+      }
+    }
+    if (this.trailTimes[this.trailTimes.length - 1] !== time) {
+      this.addTrailPoint(bob2ViewPos);
+    }
   }
 
   private addTrailPoint(point: Vector2): void {
     this.trailPoints.push(point.copy());
+    this.trailTimes.push(this.model.timeProperty.value);
 
     // Limit trail length
     if (this.trailPoints.length > this.maxTrailPoints) {
       this.trailPoints.shift();
+      this.trailTimes.shift();
     }
 
+    this.trailPath.shape = null;
     // Update trail shape
     if (this.trailPoints.length > 1) {
       const shape = new Shape();
@@ -759,6 +773,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
 
   private clearTrail(): void {
     this.trailPoints.length = 0;
+    this.trailTimes.length = 0;
     this.trailPath.shape = null;
   }
 

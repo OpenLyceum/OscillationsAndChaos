@@ -123,6 +123,16 @@ export class SingleSpringModel extends BaseModel {
     return this.dampingProperty.value === 0;
   }
 
+  protected getHistoryParameters(): NumberProperty[] {
+    return [
+      this.massProperty,
+      this.springConstantProperty,
+      this.dampingProperty,
+      this.gravityProperty,
+      this.naturalLengthProperty,
+    ];
+  }
+
   /**
    * Get the current state vector for physics integration.
    * @returns [position, velocity]

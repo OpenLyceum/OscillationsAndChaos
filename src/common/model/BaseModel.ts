@@ -34,6 +34,11 @@ export abstract class BaseModel {
   public readonly isPlayingProperty: BooleanProperty;
   public readonly timeSpeedProperty: EnumerationProperty<TimeSpeed>;
   public readonly timeProperty: NumberProperty;
+  public readonly canStepBackwardProperty = new BooleanProperty(false);
+
+  // Bound memory while retaining roughly three minutes at 60 frames per second.
+  private readonly history: { time: number; state: number[]; parameters: number[] }[] = [];
+  private readonly maxHistoryLength = 10000;
 
   // Physics solver (can be swapped based on preference)
   protected solver: ODESolver;
@@ -103,7 +108,7 @@ export abstract class BaseModel {
    * Subclasses should override and call super.resetCommon() to also reset their specific properties.
    */
   protected resetCommon(): void {
-    this.timeProperty.reset();
+    this.restartTime();
     this.isPlayingProperty.reset();
     this.timeSpeedProperty.reset();
   }
@@ -121,6 +126,11 @@ export abstract class BaseModel {
 
     // Only step if playing (unless forced for manual stepping)
     if (dt === 0 || !(this.isPlayingProperty.value || forceStep)) {
+      return;
+    }
+
+    if (dt < 0) {
+      this.restorePreviousState(Math.max(0, this.timeProperty.value + dt));
       return;
     }
 
@@ -144,6 +154,15 @@ export abstract class BaseModel {
       "all state values must be finite",
     );
 
+    this.history.push({
+      time: this.timeProperty.value,
+      state: state.slice(),
+      parameters: this.getHistoryParameters().map((property) => property.value),
+    });
+    if (this.history.length > this.maxHistoryLength) {
+      this.history.shift();
+    }
+
     // Use solver with automatic sub-stepping
     // Check each step so changing damping immediately switches integration methods.
     const solver =
@@ -158,7 +177,35 @@ export abstract class BaseModel {
 
     // Update time
     this.timeProperty.value = newTime;
+    this.canStepBackwardProperty.value = true;
   }
+
+  /** Start a new experiment, discarding rewind history even when already at zero. */
+  public restartTime(): void {
+    this.history.length = 0;
+    this.canStepBackwardProperty.value = false;
+    this.timeProperty.value = 0;
+  }
+
+  /** Restore a recorded frame at or before the requested time, never integrate backward. */
+  private restorePreviousState(targetTime: number): void {
+    if (this.history.length === 0) {
+      return;
+    }
+    let snapshot = this.history.pop()!;
+    while (snapshot.time > targetTime + 1e-12 && this.history.length > 0) {
+      snapshot = this.history.pop()!;
+    }
+    this.getHistoryParameters().forEach((property, index) => {
+      property.value = snapshot.parameters[index]!;
+    });
+    this.setState(snapshot.state);
+    this.timeProperty.value = snapshot.time;
+    this.canStepBackwardProperty.value = this.history.length > 0;
+  }
+
+  /** Physical parameters must be restored together with positions and velocities. */
+  protected abstract getHistoryParameters(): NumberProperty[];
 
   /**
    * Get the time speed multiplier based on the current time speed setting.
@@ -209,6 +256,8 @@ export abstract class BaseModel {
   public dispose(): void {
     oscillationsAndChaosPreferences.solverTypeProperty.unlink(this.solverTypeListener);
     oscillationsAndChaosPreferences.nominalTimeStepProperty.unlink(this.nominalTimeStepListener);
+    this.history.length = 0;
+    this.canStepBackwardProperty.dispose();
     this.timeProperty.dispose();
     this.isPlayingProperty.dispose();
     this.timeSpeedProperty.dispose();

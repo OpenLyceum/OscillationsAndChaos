@@ -72,6 +72,8 @@ export type TimeControllableModel = {
   isPlayingProperty: BooleanProperty;
   timeSpeedProperty: EnumerationProperty<TimeSpeed>;
   timeProperty: TProperty<number>;
+  canStepBackwardProperty: BooleanProperty;
+  restartTime(): void;
   reset(): void;
   step(dt: number, forceStep?: boolean): void;
 };
@@ -454,6 +456,12 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     const stepperEnabledProperty = new DerivedProperty([this.model.isPlayingProperty], (isPlaying) => !isPlaying);
     this.disposeEmitter.addListener(() => stepperEnabledProperty.dispose());
 
+    const backwardEnabledProperty = new DerivedProperty(
+      [this.model.isPlayingProperty, this.model.canStepBackwardProperty],
+      (isPlaying, canStepBackward) => !isPlaying && canStepBackward,
+    );
+    this.disposeEmitter.addListener(() => backwardEnabledProperty.dispose());
+
     // Time controls (play/pause and speed)
     const timeControlNode = new TimeControlNode(this.model.isPlayingProperty, {
       timeSpeedProperty: this.model.timeSpeedProperty,
@@ -478,7 +486,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
             this.model.step(-manualStepSize, true);
             this.step(-manualStepSize);
           },
-          enabledProperty: stepperEnabledProperty,
+          enabledProperty: backwardEnabledProperty,
           radius: 15, // Smaller than play/pause button
         },
       },
@@ -565,7 +573,11 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
             ? a11yStrings.simulationPlayingStringProperty.value
             : a11yStrings.simulationPausedStringProperty.value;
           SimulationAnnouncer.announceSimulationState(announcement);
-        } else if (keysPressed === "arrowLeft" && !this.model.isPlayingProperty.value) {
+        } else if (
+          keysPressed === "arrowLeft" &&
+          !this.model.isPlayingProperty.value &&
+          this.model.canStepBackwardProperty.value
+        ) {
           // Step backward with Left Arrow (only when paused)
           this.model.step(-manualStepSize, true);
           this.step(-manualStepSize);
@@ -615,7 +627,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
    * treating the jump as a backward step for the stopwatch or graph.
    */
   protected restartModelTime(): void {
-    this.model.timeProperty.value = 0;
+    this.model.restartTime();
     this.lastModelTime = 0;
   }
 

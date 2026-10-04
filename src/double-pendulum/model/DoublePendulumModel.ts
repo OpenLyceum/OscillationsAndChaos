@@ -213,6 +213,17 @@ export class DoublePendulumModel extends BaseModel {
     ]);
   }
 
+  protected getHistoryParameters(): NumberProperty[] {
+    return [
+      this.length1Property,
+      this.length2Property,
+      this.mass1Property,
+      this.mass2Property,
+      this.gravityProperty,
+      this.dampingProperty,
+    ];
+  }
+
   /**
    * Get the current state vector for physics integration.
    * @returns [angle1, angularVelocity1, angle2, angularVelocity2]

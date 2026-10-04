@@ -119,3 +119,19 @@ without going below zero and clear graph data from the old future before samplin
 Dispose views before their models. Views unlink their property and document listeners, dispose
 owned tools, and dispose their node trees. Models unlink global solver preferences and dispose
 state, parameter, and derived properties.
+
+## Time control and rewind
+
+`BaseModel` advances physics only while playing or for a forced manual step. Forward
+steps save positions, velocities, and physical parameters in a bounded history of
+10,000 frames. Backward steps restore a recorded frame at or before the requested
+time (or the earliest retained frame), rather than integrating dissipative or
+chaotic dynamics backward. Manual forward/backward pairs restore the exact saved
+state. Resuming after rewind starts a new branch and discards the abandoned future.
+The backward control disables when history is exhausted; time never goes below zero.
+
+Reset and preset application use `restartTime()` to clear history, including when
+the clock is already zero. Reset restores playing status and normal speed; presets
+preserve play/pause status and the independent stopwatch reading. Views advance
+stopwatches and graphs using changes in model time. Double-pendulum trail points
+are timestamped, retained during pauses, and trimmed on rewind.
