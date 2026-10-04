@@ -42,7 +42,7 @@ describe("DoublePendulumModel", () => {
   let model: DoublePendulumModel;
 
   afterEach(() => {
-    model.reset();
+    model.dispose();
     oscillationsAndChaosPreferences.solverTypeProperty.reset();
   });
 

@@ -39,6 +39,14 @@ export abstract class BaseModel {
   protected solver: ODESolver;
 
   private readonly supportsPEFRL: boolean;
+  private readonly solverTypeListener = (solverType: SolverType): void => {
+    this.solver = this.createSolver(solverType);
+  };
+  private readonly nominalTimeStepListener = (nominalTimeStep: NominalTimeStep): void => {
+    this.solver.setFixedTimeStep(nominalTimeStep.value);
+    this.dampedSolver.setFixedTimeStep(nominalTimeStep.value);
+  };
+  private readonly dampedSolver = new RungeKuttaSolver();
 
   protected constructor(supportsPEFRL: boolean = true) {
     this.supportsPEFRL = supportsPEFRL;
@@ -53,14 +61,10 @@ export abstract class BaseModel {
     this.solver = this.createSolver(oscillationsAndChaosPreferences.solverTypeProperty.value);
 
     // Listen for solver type changes and recreate solver
-    oscillationsAndChaosPreferences.solverTypeProperty.link((solverType: SolverType) => {
-      this.solver = this.createSolver(solverType);
-    });
+    oscillationsAndChaosPreferences.solverTypeProperty.link(this.solverTypeListener);
 
     // Listen for nominal time step changes and update the solver
-    oscillationsAndChaosPreferences.nominalTimeStepProperty.link((nominalTimeStep: NominalTimeStep) => {
-      this.solver.setFixedTimeStep(nominalTimeStep.value);
-    });
+    oscillationsAndChaosPreferences.nominalTimeStepProperty.link(this.nominalTimeStepListener);
   }
 
   /**
@@ -89,6 +93,11 @@ export abstract class BaseModel {
     return solver;
   }
 
+  /** PEFRL requires acceleration to be independent of velocity. */
+  protected isPEFRLCompatible(): boolean {
+    return true;
+  }
+
   /**
    * Reset time-related properties to their initial values.
    * Subclasses should override and call super.resetCommon() to also reset their specific properties.
@@ -111,7 +120,7 @@ export abstract class BaseModel {
     assert?.(Number.isFinite(dt), "dt must be finite");
 
     // Only step if playing (unless forced for manual stepping)
-    if (!(this.isPlayingProperty.value || forceStep)) {
+    if (dt === 0 || !(this.isPlayingProperty.value || forceStep)) {
       return;
     }
 
@@ -136,7 +145,10 @@ export abstract class BaseModel {
     );
 
     // Use solver with automatic sub-stepping
-    const newTime = this.solver.step(state, this.getDerivatives.bind(this), this.timeProperty.value, adjustedDt);
+    // Check each step so changing damping immediately switches integration methods.
+    const solver =
+      this.solver instanceof ForestRuthPEFRLSolver && !this.isPEFRLCompatible() ? this.dampedSolver : this.solver;
+    const newTime = solver.step(state, this.getDerivatives.bind(this), this.timeProperty.value, adjustedDt);
 
     // Validate computed time
     assert?.(Number.isFinite(newTime), "newTime must be finite");
@@ -193,6 +205,14 @@ export abstract class BaseModel {
    * Subclasses must implement this to reset all their properties.
    */
   public abstract reset(): void;
+
+  public dispose(): void {
+    oscillationsAndChaosPreferences.solverTypeProperty.unlink(this.solverTypeListener);
+    oscillationsAndChaosPreferences.nominalTimeStepProperty.unlink(this.nominalTimeStepListener);
+    this.timeProperty.dispose();
+    this.isPlayingProperty.dispose();
+    this.timeSpeedProperty.dispose();
+  }
 }
 
 // Register with namespace for debugging accessibility

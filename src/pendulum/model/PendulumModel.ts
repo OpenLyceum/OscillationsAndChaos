@@ -18,7 +18,7 @@
  * simple harmonic. For large angles, the nonlinearity of sin(θ) becomes significant.
  */
 
-import { DerivedProperty, NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { DerivedProperty, NumberProperty, type ReadOnlyProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
@@ -39,10 +39,10 @@ export class PendulumModel extends BaseModel {
   public readonly dampingProperty: NumberProperty;
 
   // Computed values
-  public readonly angularAccelerationProperty: TReadOnlyProperty<number>;
-  public readonly kineticEnergyProperty: TReadOnlyProperty<number>;
-  public readonly potentialEnergyProperty: TReadOnlyProperty<number>;
-  public readonly totalEnergyProperty: TReadOnlyProperty<number>;
+  public readonly angularAccelerationProperty: ReadOnlyProperty<number>;
+  public readonly kineticEnergyProperty: ReadOnlyProperty<number>;
+  public readonly potentialEnergyProperty: ReadOnlyProperty<number>;
+  public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
   public constructor() {
     super();
@@ -110,6 +110,10 @@ export class PendulumModel extends BaseModel {
     this.stateMapper = new StatePropertyMapper([this.angleProperty, this.angularVelocityProperty]);
   }
 
+  protected override isPEFRLCompatible(): boolean {
+    return this.dampingProperty.value === 0;
+  }
+
   /**
    * Get the current state vector for physics integration.
    * @returns [angle, angularVelocity]
@@ -148,9 +152,22 @@ export class PendulumModel extends BaseModel {
     derivatives[1]! = -(g / L) * Math.sin(theta) - (b / I) * omega;
   }
 
-  /**
-   * Reset the model to initial conditions.
-   */
+  /** Release owned properties and global preference listeners. */
+  public override dispose(): void {
+    this.totalEnergyProperty.dispose();
+    this.potentialEnergyProperty.dispose();
+    this.kineticEnergyProperty.dispose();
+    this.angularAccelerationProperty.dispose();
+    this.angleProperty.dispose();
+    this.angularVelocityProperty.dispose();
+    this.lengthProperty.dispose();
+    this.massProperty.dispose();
+    this.gravityProperty.dispose();
+    this.dampingProperty.dispose();
+    super.dispose();
+  }
+
+  /** Reset the model to initial conditions. */
   public reset(): void {
     this.angleProperty.reset();
     this.angularVelocityProperty.reset();

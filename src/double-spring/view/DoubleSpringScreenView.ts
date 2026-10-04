@@ -12,6 +12,7 @@ import { Line, type Node, Rectangle, RichDragListener, RichText, Text, VBox } fr
 import { FormulaNode, PhetFont } from "scenerystack/scenery-phet";
 import type { ScreenSummaryContent } from "scenerystack/sim";
 import type { Preset } from "../../common/model/Preset.js";
+import { constrainSpringDragPosition } from "../../common/util/constrainSpringDragPosition.js";
 import SimulationAnnouncer from "../../common/util/SimulationAnnouncer.js";
 import { BaseScreenView, type BaseScreenViewOptions } from "../../common/view/BaseScreenView.js";
 import {
@@ -175,10 +176,10 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.parametricSpring2Node.visible = useParametric;
 
     // Link spring constants to visual appearance
-    this.model.springConstant1Property.link((k) => {
+    this.linkProperty(this.model.springConstant1Property, (k) => {
       this.updateSpring1Appearance(k);
     });
-    this.model.springConstant2Property.link((k) => {
+    this.linkProperty(this.model.springConstant2Property, (k) => {
       this.updateSpring2Appearance(k);
     });
 
@@ -233,16 +234,16 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.addChild(this.mass2ReferenceLine);
 
     // Link masses to visual sizes
-    this.model.mass1Property.link((mass) => {
+    this.linkProperty(this.model.mass1Property, (mass) => {
       this.updateMass1Size(mass);
     });
-    this.model.mass2Property.link((mass) => {
+    this.linkProperty(this.model.mass2Property, (mass) => {
       this.updateMass2Size(mass);
     });
 
     // Listen to spring visualization preference changes
     // Using lazyLink to avoid triggering during initialization
-    oscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
+    this.lazyLinkProperty(oscillationsAndChaosPreferences.springVisualizationTypeProperty, (springType) => {
       this.switchSpringVisualization(springType);
     });
 
@@ -254,7 +255,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
       const announcement = template.replace("{{position}}", position);
       SimulationAnnouncer.announceDragInteraction(announcement);
     };
-    this.mass1Node.addInputListener(
+    this.addDisposableInputListener(
+      this.mass1Node,
       new RichDragListener({
         transform: this.modelViewTransform!,
         dragListenerOptions: {
@@ -268,7 +270,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
             const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
-            this.model.position1Property.value = this.model.position1Property.rangeProperty.value.constrainValue(
+            this.model.position1Property.value = constrainSpringDragPosition(
+              this.model.position1Property.value,
               pointerModelY + dragOffsetModel1,
             );
             this.model.velocity1Property.value = 0;
@@ -283,7 +286,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
             SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingMass1StringProperty.value);
           },
           drag: (_event, listener) => {
-            this.model.position1Property.value = this.model.position1Property.rangeProperty.value.constrainValue(
+            this.model.position1Property.value = constrainSpringDragPosition(
+              this.model.position1Property.value,
               this.model.position1Property.value + listener.modelDelta.y,
             );
             this.model.velocity1Property.value = 0;
@@ -300,7 +304,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
       const announcement = template.replace("{{position}}", position);
       SimulationAnnouncer.announceDragInteraction(announcement);
     };
-    this.mass2Node.addInputListener(
+    this.addDisposableInputListener(
+      this.mass2Node,
       new RichDragListener({
         transform: this.modelViewTransform!,
         dragListenerOptions: {
@@ -314,7 +319,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
             const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
-            this.model.position2Property.value = this.model.position2Property.rangeProperty.value.constrainValue(
+            this.model.position2Property.value = constrainSpringDragPosition(
+              this.model.position2Property.value,
               pointerModelY + dragOffsetModel2,
             );
             this.model.velocity2Property.value = 0;
@@ -329,7 +335,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
             SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingMass2StringProperty.value);
           },
           drag: (_event, listener) => {
-            this.model.position2Property.value = this.model.position2Property.rangeProperty.value.constrainValue(
+            this.model.position2Property.value = constrainSpringDragPosition(
+              this.model.position2Property.value,
               this.model.position2Property.value + listener.modelDelta.y,
             );
             this.model.velocity2Property.value = 0;
@@ -340,10 +347,10 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     );
 
     // Link model to view
-    this.model.position1Property.link(() => this.updateVisualization());
-    this.model.position2Property.link(() => this.updateVisualization());
-    this.model.naturalLength1Property.link(() => this.updateVisualization());
-    this.model.naturalLength2Property.link(() => this.updateVisualization());
+    this.linkProperty(this.model.position1Property, () => this.updateVisualization());
+    this.linkProperty(this.model.position2Property, () => this.updateVisualization());
+    this.linkProperty(this.model.naturalLength1Property, () => this.updateVisualization());
+    this.linkProperty(this.model.naturalLength2Property, () => this.updateVisualization());
 
     // Create vector nodes using factory
     const vectors1 = VectorNodeFactory.createVectorNodes("₁");
@@ -365,17 +372,17 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.addChild(this.acceleration2VectorNode);
 
     // Link visibility properties to vector nodes
-    this.showVelocityProperty.link((showVelocity) => {
+    this.linkProperty(this.showVelocityProperty, (showVelocity) => {
       this.velocity1VectorNode.setVectorVisible(showVelocity);
       this.velocity2VectorNode.setVectorVisible(showVelocity);
     });
 
-    this.showForceProperty.link((showForce) => {
+    this.linkProperty(this.showForceProperty, (showForce) => {
       this.force1VectorNode.setVectorVisible(showForce);
       this.force2VectorNode.setVectorVisible(showForce);
     });
 
-    this.showAccelerationProperty.link((showAcceleration) => {
+    this.linkProperty(this.showAccelerationProperty, (showAcceleration) => {
       this.acceleration1VectorNode.setVectorVisible(showAcceleration);
       this.acceleration2VectorNode.setVectorVisible(showAcceleration);
     });
@@ -451,7 +458,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.pdomPlayAreaNode.addChild(this.mass2Node);
 
     // Listen for preset changes to apply configuration
-    this.presetProperty.link((preset) => {
+    this.linkProperty(this.presetProperty, (preset) => {
       if (preset !== "Custom" && !this.isApplyingPreset) {
         this.applyPreset(preset);
       }
@@ -463,13 +470,13 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
         this.presetProperty.value = "Custom";
       }
     };
-    this.model.mass1Property.lazyLink(detectCustomChange);
-    this.model.mass2Property.lazyLink(detectCustomChange);
-    this.model.springConstant1Property.lazyLink(detectCustomChange);
-    this.model.springConstant2Property.lazyLink(detectCustomChange);
-    this.model.damping1Property.lazyLink(detectCustomChange);
-    this.model.damping2Property.lazyLink(detectCustomChange);
-    this.model.gravityProperty.lazyLink(detectCustomChange);
+    this.lazyLinkProperty(this.model.mass1Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.mass2Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.springConstant1Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.springConstant2Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.damping1Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.damping2Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.gravityProperty, detectCustomChange);
 
     // Add accessibility announcements for parameter changes
     const announce = (template: string, value: number, decimalPlaces: number) => {
@@ -477,25 +484,25 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
         StringUtils.fillIn(template, { value: StringUtils.toFixedNumberLTR(value, decimalPlaces) }),
       );
     };
-    this.model.mass1Property.lazyLink((mass) => {
+    this.lazyLinkProperty(this.model.mass1Property, (mass) => {
       announce(this.a11yStrings.mass1ChangedStringProperty.value, mass, 1);
     });
-    this.model.mass2Property.lazyLink((mass) => {
+    this.lazyLinkProperty(this.model.mass2Property, (mass) => {
       announce(this.a11yStrings.mass2ChangedStringProperty.value, mass, 1);
     });
-    this.model.springConstant1Property.lazyLink((springConstant) => {
+    this.lazyLinkProperty(this.model.springConstant1Property, (springConstant) => {
       announce(this.a11yStrings.springConstant1ChangedStringProperty.value, springConstant, 0);
     });
-    this.model.springConstant2Property.lazyLink((springConstant) => {
+    this.lazyLinkProperty(this.model.springConstant2Property, (springConstant) => {
       announce(this.a11yStrings.springConstant2ChangedStringProperty.value, springConstant, 0);
     });
-    this.model.damping1Property.lazyLink((damping) => {
+    this.lazyLinkProperty(this.model.damping1Property, (damping) => {
       announce(this.a11yStrings.damping1ChangedStringProperty.value, damping, 2);
     });
-    this.model.damping2Property.lazyLink((damping) => {
+    this.lazyLinkProperty(this.model.damping2Property, (damping) => {
       announce(this.a11yStrings.damping2ChangedStringProperty.value, damping, 2);
     });
-    this.model.gravityProperty.lazyLink((gravity) => {
+    this.lazyLinkProperty(this.model.gravityProperty, (gravity) => {
       announce(this.a11yStrings.gravityChangedStringProperty.value, gravity, 1);
     });
 
@@ -664,7 +671,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
 
     // Link text color property to formula nodes
     // FormulaNode extends DOM, so we need to set the color via CSS
-    OscillationsAndChaosColors.textColorProperty.link((color) => {
+    this.linkProperty(OscillationsAndChaosColors.textColorProperty, (color) => {
       equation1.element.style.color = color.toCSS();
       equation2.element.style.color = color.toCSS();
       variablesList.element.style.color = color.toCSS();
@@ -835,7 +842,6 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
 
   public override step(dt: number): void {
     super.step(dt); // Step the stopwatch, graph, and other base view components
-    this.model.step(dt);
 
     // Update vector visualizations
     this.updateVectors();
@@ -928,7 +934,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.model.velocity2Property.value = 0;
 
     // Reset simulation time only (don't reset the parameters we just set!)
-    this.model.timeProperty.value = 0;
+    this.restartModelTime();
 
     // Clear the graph when switching presets (if it exists)
     if (this.configurableGraph) {

@@ -528,12 +528,20 @@ export class ConfigurableGraph extends Node {
 
   /**
    * Add a new data point based on current property values
+   * @param time - Simulation time of the point, used to trim history when stepping backward
    */
-  public addDataPoint(): void {
+  public addDataPoint(time: number): void {
     const xValue = this.xPropertyProperty.value.property.value;
     const yValue = this.yPropertyProperty.value.property.value;
 
-    this.dataManager.addDataPoint(xValue, yValue);
+    this.dataManager.addDataPoint(xValue, yValue, time);
+  }
+
+  /**
+   * Remove points recorded at or after the given simulation time
+   */
+  public discardDataFrom(time: number): void {
+    this.dataManager.discardDataFrom(time);
   }
 
   /**

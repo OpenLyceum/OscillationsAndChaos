@@ -100,7 +100,7 @@ Configurable solvers (Preferences):
 |---|---|
 | **RK4** | Default; fixed step, good accuracy/speed balance |
 | **Adaptive RK45** | Variable internal step |
-| **Forest–Ruth PEFRL** | Symplectic; better long-term energy behavior |
+| **Forest–Ruth PEFRL** | Symplectic for undamped springs and the single pendulum; RK4 fallback with damping or for the double pendulum |
 | **Dormand–Prince 8(7)** | High-order adaptive |
 
 Nominal fixed steps: 0.01 ms – 5 ms (default **1 ms**). Smaller steps improve accuracy for chaotic

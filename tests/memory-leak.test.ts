@@ -6,6 +6,10 @@
 import { NumberProperty } from "scenerystack/axon";
 import { describe, expect, it } from "vitest";
 import { StatePropertyMapper } from "../src/common/model/StatePropertyMapper.js";
+import { DoublePendulumModel } from "../src/double-pendulum/model/DoublePendulumModel.js";
+import { DoubleSpringModel } from "../src/double-spring/model/DoubleSpringModel.js";
+import { PendulumModel } from "../src/pendulum/model/PendulumModel.js";
+import { SingleSpringModel } from "../src/single-spring/model/SingleSpringModel.js";
 import { describeDisposalLeaks, forceGC } from "./helpers/memoryLeak.js";
 
 function createAndDisposeMapper(): WeakRef<object> {
@@ -36,4 +40,9 @@ describe("Memory leak regression", () => {
   });
 });
 
-describeDisposalLeaks([]);
+describeDisposalLeaks(
+  [SingleSpringModel, DoubleSpringModel, PendulumModel, DoublePendulumModel].map((Model) => ({
+    name: Model.name,
+    create: () => new Model(),
+  })),
+);

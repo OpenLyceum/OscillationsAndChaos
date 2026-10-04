@@ -23,6 +23,8 @@ export interface GridVisualizationConfig {
 
 export class GraphDataManager {
   private readonly dataPoints: Vector2[] = [];
+  // Simulation time of each data point, parallel to dataPoints
+  private readonly dataTimes: number[] = [];
   private readonly maxDataPoints: number;
   private readonly chartTransform: ChartTransform;
   private readonly linePlot: LinePlot;
@@ -60,7 +62,7 @@ export class GraphDataManager {
   /**
    * Add a new data point to the graph
    */
-  public addDataPoint(xValue: number, yValue: number): void {
+  public addDataPoint(xValue: number, yValue: number, time: number): void {
     // Skip invalid values
     if (!(Number.isFinite(xValue) && Number.isFinite(yValue))) {
       return;
@@ -68,10 +70,12 @@ export class GraphDataManager {
 
     // Add point
     this.dataPoints.push(new Vector2(xValue, yValue));
+    this.dataTimes.push(time);
 
     // Remove oldest point if we exceed max
     if (this.dataPoints.length > this.maxDataPoints) {
       this.dataPoints.shift();
+      this.dataTimes.shift();
     }
 
     // Update the line plot
@@ -91,6 +95,7 @@ export class GraphDataManager {
    */
   public clearData(): void {
     this.dataPoints.length = 0;
+    this.dataTimes.length = 0;
     this.linePlot.setDataSet([]);
 
     // Reset to default ranges
@@ -106,6 +111,26 @@ export class GraphDataManager {
 
     // Reset zoom state
     this.isManuallyZoomed = false;
+  }
+
+  /**
+   * Remove points recorded at or after the given time, keeping earlier history.
+   */
+  public discardDataFrom(time: number): void {
+    let count = this.dataTimes.length;
+    while (count > 0 && this.dataTimes[count - 1]! >= time) {
+      count--;
+    }
+    if (count === this.dataTimes.length) {
+      return;
+    }
+    this.dataPoints.length = count;
+    this.dataTimes.length = count;
+    this.linePlot.setDataSet(this.dataPoints);
+    if (this.dataPoints.length > 1 && !this.isManuallyZoomed) {
+      this.updateAxisRanges();
+    }
+    this.updateTrail();
   }
 
   /**

@@ -54,3 +54,24 @@ describe("PEFRL state layout", () => {
     expect(state[3]).toBeCloseTo(2 * Math.cos(0.16), 10);
   });
 });
+
+it("RK45 returns the fifth-order solution when internal steps stay below tolerance", () => {
+  const errors: number[] = [];
+  for (const h of [0.05, 0.025]) {
+    const solver = new AdaptiveRK45Solver();
+    solver.setFixedTimeStep(h);
+    const state = [1];
+    solver.step(
+      state,
+      (s, d) => {
+        d[0] = s[0]!;
+      },
+      0,
+      1,
+    );
+    errors.push(Math.abs(state[0]! - Math.E));
+  }
+  // A fifth-order method reduces global error about 32-fold when h is halved.
+  expect(errors[0]! / errors[1]!).toBeGreaterThan(25);
+  expect(errors[0]! / errors[1]!).toBeLessThan(40);
+});

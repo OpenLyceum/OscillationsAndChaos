@@ -136,7 +136,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.addChild(pendulumLabProtractor);
 
     // Link visibility
-    this.showProtractorProperty.link((visible: boolean) => {
+    this.linkProperty(this.showProtractorProperty, (visible: boolean) => {
       pendulumLabProtractor.visible = visible;
     });
 
@@ -150,7 +150,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
 
     // Trail visibility property
     this.trailVisibleProperty = new BooleanProperty(true);
-    this.trailVisibleProperty.link((visible) => {
+    this.linkProperty(this.trailVisibleProperty, (visible) => {
       this.trailPath.visible = visible;
     });
 
@@ -226,14 +226,15 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.addChild(this.bob2ReferenceDot);
 
     // Link masses to visual sizes
-    this.model.mass1Property.link((mass) => {
+    this.linkProperty(this.model.mass1Property, (mass) => {
       this.updateBob1Size(mass);
     });
-    this.model.mass2Property.link((mass) => {
+    this.linkProperty(this.model.mass2Property, (mass) => {
       this.updateBob2Size(mass);
     });
 
-    this.bob1Node.addInputListener(
+    this.addDisposableInputListener(
+      this.bob1Node,
       new RichDragListener({
         dragListenerOptions: {
           translateNode: false,
@@ -279,7 +280,8 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
       }),
     );
 
-    this.bob2Node.addInputListener(
+    this.addDisposableInputListener(
+      this.bob2Node,
       new RichDragListener({
         dragListenerOptions: {
           translateNode: false,
@@ -332,11 +334,11 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     // Link model to view
     // Note: We update visualization in step() to avoid inconsistent intermediate states
     // Only listen to length changes to clear trail and update immediately
-    this.model.length1Property.link(() => {
+    this.linkProperty(this.model.length1Property, () => {
       this.updateVisualization();
       this.clearTrail();
     });
-    this.model.length2Property.link(() => {
+    this.linkProperty(this.model.length2Property, () => {
       this.updateVisualization();
       this.clearTrail();
     });
@@ -366,17 +368,17 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.addChild(this.acceleration2VectorNode);
 
     // Link visibility properties to vector nodes
-    this.showVelocityProperty.link((showVelocity) => {
+    this.linkProperty(this.showVelocityProperty, (showVelocity) => {
       this.velocity1VectorNode.setVectorVisible(showVelocity);
       this.velocity2VectorNode.setVectorVisible(showVelocity);
     });
 
-    this.showForceProperty.link((showForce) => {
+    this.linkProperty(this.showForceProperty, (showForce) => {
       this.force1VectorNode.setVectorVisible(showForce);
       this.force2VectorNode.setVectorVisible(showForce);
     });
 
-    this.showAccelerationProperty.link((showAcceleration) => {
+    this.linkProperty(this.showAccelerationProperty, (showAcceleration) => {
       this.acceleration1VectorNode.setVectorVisible(showAcceleration);
       this.acceleration2VectorNode.setVectorVisible(showAcceleration);
     });
@@ -386,7 +388,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.addChild(controlPanel);
 
     // Listen for preset changes to apply configuration
-    this.presetProperty.link((preset) => {
+    this.linkProperty(this.presetProperty, (preset) => {
       if (preset !== "Custom" && !this.isApplyingPreset) {
         this.applyPreset(preset);
       }
@@ -398,12 +400,12 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
         this.presetProperty.value = "Custom";
       }
     };
-    this.model.length1Property.lazyLink(detectCustomChange);
-    this.model.length2Property.lazyLink(detectCustomChange);
-    this.model.mass1Property.lazyLink(detectCustomChange);
-    this.model.mass2Property.lazyLink(detectCustomChange);
-    this.model.gravityProperty.lazyLink(detectCustomChange);
-    this.model.dampingProperty.lazyLink(detectCustomChange);
+    this.lazyLinkProperty(this.model.length1Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.length2Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.mass1Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.mass2Property, detectCustomChange);
+    this.lazyLinkProperty(this.model.gravityProperty, detectCustomChange);
+    this.lazyLinkProperty(this.model.dampingProperty, detectCustomChange);
 
     // Add accessibility announcements for parameter changes
     const announce = (template: string, value: number, decimalPlaces: number) => {
@@ -411,22 +413,22 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
         StringUtils.fillIn(template, { value: StringUtils.toFixedNumberLTR(value, decimalPlaces) }),
       );
     };
-    this.model.length1Property.lazyLink((length) => {
+    this.lazyLinkProperty(this.model.length1Property, (length) => {
       announce(this.a11yStrings.upperLengthChangedStringProperty.value, length, 1);
     });
-    this.model.length2Property.lazyLink((length) => {
+    this.lazyLinkProperty(this.model.length2Property, (length) => {
       announce(this.a11yStrings.lowerLengthChangedStringProperty.value, length, 1);
     });
-    this.model.mass1Property.lazyLink((mass) => {
+    this.lazyLinkProperty(this.model.mass1Property, (mass) => {
       announce(this.a11yStrings.upperMassChangedStringProperty.value, mass, 1);
     });
-    this.model.mass2Property.lazyLink((mass) => {
+    this.lazyLinkProperty(this.model.mass2Property, (mass) => {
       announce(this.a11yStrings.lowerMassChangedStringProperty.value, mass, 1);
     });
-    this.model.gravityProperty.lazyLink((gravity) => {
+    this.lazyLinkProperty(this.model.gravityProperty, (gravity) => {
       announce(this.a11yStrings.gravityChangedStringProperty.value, gravity, 1);
     });
-    this.model.dampingProperty.lazyLink((damping) => {
+    this.lazyLinkProperty(this.model.dampingProperty, (damping) => {
       announce(this.a11yStrings.dampingChangedStringProperty.value, damping, 2);
     });
 
@@ -545,7 +547,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
         }
       },
     });
-    this.addInputListener(trailKeyboardListener);
+    this.addDisposableInputListener(this, trailKeyboardListener);
 
     // Initial visualization
     this.updateVisualization();
@@ -659,7 +661,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
 
     // Link text color property to formula nodes
     // FormulaNode extends DOM, so we need to set the color via CSS
-    OscillationsAndChaosColors.textColorProperty.link((color) => {
+    this.linkProperty(OscillationsAndChaosColors.textColorProperty, (color) => {
       equation1.element.style.color = color.toCSS();
       equation2.element.style.color = color.toCSS();
       variablesList.element.style.color = color.toCSS();
@@ -798,6 +800,11 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.updateVisualization();
   }
 
+  public override dispose(): void {
+    super.dispose();
+    this.trailVisibleProperty.dispose();
+  }
+
   public override reset(): void {
     super.reset(); // Reset base view properties (including vector visibility properties and graph)
 
@@ -813,7 +820,6 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
 
   public override step(dt: number): void {
     super.step(dt); // Step the stopwatch, graph, and other base view components
-    this.model.step(dt);
     // Update visualization after physics step completes
     // This ensures all state variables are updated consistently before drawing
     this.updateVisualization();
@@ -946,7 +952,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.model.angularVelocity2Property.value = 0;
 
     // Reset simulation time only (don't reset the parameters we just set!)
-    this.model.timeProperty.value = 0;
+    this.restartModelTime();
 
     // Clear trail when switching presets
     this.clearTrail();

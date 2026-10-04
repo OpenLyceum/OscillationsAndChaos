@@ -16,7 +16,7 @@
  * controls energy dissipation, and gravity g provides a constant downward force.
  */
 
-import { DerivedProperty, NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { DerivedProperty, NumberProperty, type ReadOnlyProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
@@ -38,21 +38,19 @@ export class SingleSpringModel extends BaseModel {
   public readonly naturalLengthProperty: NumberProperty;
 
   // Computed values
-  public readonly accelerationProperty: TReadOnlyProperty<number>;
-  public readonly kineticEnergyProperty: TReadOnlyProperty<number>;
-  public readonly potentialEnergyProperty: TReadOnlyProperty<number>;
-  public readonly springPotentialEnergyProperty: TReadOnlyProperty<number>;
-  public readonly gravitationalPotentialEnergyProperty: TReadOnlyProperty<number>;
-  public readonly totalEnergyProperty: TReadOnlyProperty<number>;
+  public readonly accelerationProperty: ReadOnlyProperty<number>;
+  public readonly kineticEnergyProperty: ReadOnlyProperty<number>;
+  public readonly potentialEnergyProperty: ReadOnlyProperty<number>;
+  public readonly springPotentialEnergyProperty: ReadOnlyProperty<number>;
+  public readonly gravitationalPotentialEnergyProperty: ReadOnlyProperty<number>;
+  public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
   public constructor() {
     super();
 
     // Initialize state to match first preset ("Heavy and Slow")
     // Position matches first preset initial displacement
-    this.positionProperty = new NumberProperty(1.0, {
-      range: new Range(-5, 5),
-    });
+    this.positionProperty = new NumberProperty(1.0);
 
     this.velocityProperty = new NumberProperty(0.0);
 
@@ -121,6 +119,10 @@ export class SingleSpringModel extends BaseModel {
     this.stateMapper = new StatePropertyMapper([this.positionProperty, this.velocityProperty]);
   }
 
+  protected override isPEFRLCompatible(): boolean {
+    return this.dampingProperty.value === 0;
+  }
+
   /**
    * Get the current state vector for physics integration.
    * @returns [position, velocity]
@@ -158,9 +160,25 @@ export class SingleSpringModel extends BaseModel {
     derivatives[1]! = (-k * x - b * v + m * g) / m;
   }
 
-  /**
-   * Reset the model to initial conditions.
-   */
+  /** Release owned properties and global preference listeners. */
+  public override dispose(): void {
+    this.totalEnergyProperty.dispose();
+    this.gravitationalPotentialEnergyProperty.dispose();
+    this.springPotentialEnergyProperty.dispose();
+    this.potentialEnergyProperty.dispose();
+    this.kineticEnergyProperty.dispose();
+    this.accelerationProperty.dispose();
+    this.positionProperty.dispose();
+    this.velocityProperty.dispose();
+    this.massProperty.dispose();
+    this.springConstantProperty.dispose();
+    this.dampingProperty.dispose();
+    this.gravityProperty.dispose();
+    this.naturalLengthProperty.dispose();
+    super.dispose();
+  }
+
+  /** Reset the model to initial conditions. */
   public reset(): void {
     this.positionProperty.reset();
     this.velocityProperty.reset();

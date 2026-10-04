@@ -44,5 +44,6 @@ export class DoublePendulumScreenSummaryContent extends ScreenSummaryContent {
       currentDetailsContent: currentDetailsProperty,
       interactionHintContent: summary.interactionHintStringProperty,
     });
+    this.disposeEmitter.addListener(() => currentDetailsProperty.dispose());
   }
 }

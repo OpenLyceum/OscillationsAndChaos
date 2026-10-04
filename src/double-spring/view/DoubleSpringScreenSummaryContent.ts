@@ -41,5 +41,6 @@ export class DoubleSpringScreenSummaryContent extends ScreenSummaryContent {
       currentDetailsContent: currentDetailsProperty,
       interactionHintContent: summary.interactionHintStringProperty,
     });
+    this.disposeEmitter.addListener(() => currentDetailsProperty.dispose());
   }
 }

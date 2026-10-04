@@ -14,7 +14,7 @@
  * of the relative angle (θ2 - θ1).
  */
 
-import { DerivedProperty, NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { DerivedProperty, NumberProperty, type ReadOnlyProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
@@ -79,11 +79,11 @@ export class DoublePendulumModel extends BaseModel {
   public readonly dampingProperty: NumberProperty;
 
   // Computed values
-  public readonly angularAcceleration1Property: TReadOnlyProperty<number>;
-  public readonly angularAcceleration2Property: TReadOnlyProperty<number>;
-  public readonly kineticEnergyProperty: TReadOnlyProperty<number>;
-  public readonly potentialEnergyProperty: TReadOnlyProperty<number>;
-  public readonly totalEnergyProperty: TReadOnlyProperty<number>;
+  public readonly angularAcceleration1Property: ReadOnlyProperty<number>;
+  public readonly angularAcceleration2Property: ReadOnlyProperty<number>;
+  public readonly kineticEnergyProperty: ReadOnlyProperty<number>;
+  public readonly potentialEnergyProperty: ReadOnlyProperty<number>;
+  public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
   public constructor() {
     // Coupled angular accelerations depend on velocity even without damping,
@@ -254,9 +254,27 @@ export class DoublePendulumModel extends BaseModel {
     derivatives[3]! = alpha2;
   }
 
-  /**
-   * Reset the model to initial conditions.
-   */
+  /** Release owned properties and global preference listeners. */
+  public override dispose(): void {
+    this.totalEnergyProperty.dispose();
+    this.potentialEnergyProperty.dispose();
+    this.kineticEnergyProperty.dispose();
+    this.angularAcceleration2Property.dispose();
+    this.angularAcceleration1Property.dispose();
+    this.angle1Property.dispose();
+    this.angularVelocity1Property.dispose();
+    this.angle2Property.dispose();
+    this.angularVelocity2Property.dispose();
+    this.length1Property.dispose();
+    this.length2Property.dispose();
+    this.mass1Property.dispose();
+    this.mass2Property.dispose();
+    this.gravityProperty.dispose();
+    this.dampingProperty.dispose();
+    super.dispose();
+  }
+
+  /** Reset the model to initial conditions. */
   public reset(): void {
     this.angle1Property.reset();
     this.angularVelocity1Property.reset();

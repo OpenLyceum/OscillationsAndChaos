@@ -12,6 +12,7 @@ import { Line, type Node, Rectangle, RichDragListener, RichText, Text, VBox } fr
 import { FormulaNode, PhetFont } from "scenerystack/scenery-phet";
 import type { ScreenSummaryContent } from "scenerystack/sim";
 import type { Preset } from "../../common/model/Preset.js";
+import { constrainSpringDragPosition } from "../../common/util/constrainSpringDragPosition.js";
 import SimulationAnnouncer from "../../common/util/SimulationAnnouncer.js";
 import { BaseScreenView, type BaseScreenViewOptions } from "../../common/view/BaseScreenView.js";
 import {
@@ -136,7 +137,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     this.parametricSpringNode.visible = this.currentSpringNode === this.parametricSpringNode;
 
     // Link spring constant to visual appearance
-    this.model.springConstantProperty.link((k) => {
+    this.linkProperty(this.model.springConstantProperty, (k) => {
       this.updateSpringAppearance(k);
     });
 
@@ -166,7 +167,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     this.addChild(this.massReferenceLine);
 
     // Link mass to visual size
-    this.model.massProperty.link((mass) => {
+    this.linkProperty(this.model.massProperty, (mass) => {
       this.updateMassSize(mass);
     });
 
@@ -179,7 +180,8 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
       const announcement = template.replace("{{position}}", position);
       SimulationAnnouncer.announceDragInteraction(announcement);
     };
-    this.massNode.addInputListener(
+    this.addDisposableInputListener(
+      this.massNode,
       new RichDragListener({
         transform: this.modelViewTransform!,
         dragListenerOptions: {
@@ -194,7 +196,8 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
             const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
-            this.model.positionProperty.value = this.model.positionProperty.rangeProperty.value.constrainValue(
+            this.model.positionProperty.value = constrainSpringDragPosition(
+              this.model.positionProperty.value,
               pointerModelY + dragOffsetModel,
             );
             this.model.velocityProperty.value = 0;
@@ -209,7 +212,8 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
             SimulationAnnouncer.announceDragInteraction(a11yStrings.draggingMassStringProperty.value);
           },
           drag: (_event, listener) => {
-            this.model.positionProperty.value = this.model.positionProperty.rangeProperty.value.constrainValue(
+            this.model.positionProperty.value = constrainSpringDragPosition(
+              this.model.positionProperty.value,
               this.model.positionProperty.value + listener.modelDelta.y,
             );
             this.model.velocityProperty.value = 0;
@@ -220,12 +224,14 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     );
 
     // Link model position and natural length to view
-    this.model.positionProperty.link(this.updateVisualization.bind(this));
-    this.model.naturalLengthProperty.link(() => this.updateVisualization(this.model.positionProperty.value));
+    this.linkProperty(this.model.positionProperty, this.updateVisualization.bind(this));
+    this.linkProperty(this.model.naturalLengthProperty, () =>
+      this.updateVisualization(this.model.positionProperty.value),
+    );
 
     // Listen to spring visualization preference changes
     // Using lazyLink to avoid triggering during initialization
-    oscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
+    this.lazyLinkProperty(oscillationsAndChaosPreferences.springVisualizationTypeProperty, (springType) => {
       this.switchSpringVisualization(springType);
     });
 
@@ -252,7 +258,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     this.addChild(controlPanel);
 
     // Listen for preset changes to apply configuration
-    this.presetProperty.link((preset) => {
+    this.linkProperty(this.presetProperty, (preset) => {
       if (preset !== "Custom" && !this.isApplyingPreset) {
         this.applyPreset(preset);
       }
@@ -264,28 +270,28 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
         this.presetProperty.value = "Custom";
       }
     };
-    this.model.massProperty.lazyLink(detectCustomChange);
-    this.model.springConstantProperty.lazyLink(detectCustomChange);
-    this.model.dampingProperty.lazyLink(detectCustomChange);
-    this.model.gravityProperty.lazyLink(detectCustomChange);
+    this.lazyLinkProperty(this.model.massProperty, detectCustomChange);
+    this.lazyLinkProperty(this.model.springConstantProperty, detectCustomChange);
+    this.lazyLinkProperty(this.model.dampingProperty, detectCustomChange);
+    this.lazyLinkProperty(this.model.gravityProperty, detectCustomChange);
 
     // Add accessibility announcements for parameter changes
-    this.model.massProperty.lazyLink((mass) => {
+    this.lazyLinkProperty(this.model.massProperty, (mass) => {
       const template = a11yStrings.massChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(mass, 1));
       SimulationAnnouncer.announceParameterChange(announcement);
     });
-    this.model.springConstantProperty.lazyLink((springConstant) => {
+    this.lazyLinkProperty(this.model.springConstantProperty, (springConstant) => {
       const template = a11yStrings.springConstantChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(springConstant, 0));
       SimulationAnnouncer.announceParameterChange(announcement);
     });
-    this.model.dampingProperty.lazyLink((damping) => {
+    this.lazyLinkProperty(this.model.dampingProperty, (damping) => {
       const template = a11yStrings.dampingChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(damping, 1));
       SimulationAnnouncer.announceParameterChange(announcement);
     });
-    this.model.gravityProperty.lazyLink((gravity) => {
+    this.lazyLinkProperty(this.model.gravityProperty, (gravity) => {
       const template = a11yStrings.gravityChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(gravity, 1));
       SimulationAnnouncer.announceParameterChange(announcement);
@@ -472,7 +478,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
 
     // Link text color property to formula nodes
     // FormulaNode extends DOM, so we need to set the color via CSS
-    OscillationsAndChaosColors.textColorProperty.link((color) => {
+    this.linkProperty(OscillationsAndChaosColors.textColorProperty, (color) => {
       equation.element.style.color = color.toCSS();
       variablesList.element.style.color = color.toCSS();
     });
@@ -581,8 +587,6 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
 
   public override step(dt: number): void {
     super.step(dt); // Step the stopwatch, graph, and other base view components
-    // Update model physics
-    this.model.step(dt);
 
     // Update vector visualizations
     this.updateVectors();
@@ -654,7 +658,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     this.model.velocityProperty.value = 0;
 
     // Reset simulation time only (don't reset the parameters we just set!)
-    this.model.timeProperty.value = 0;
+    this.restartModelTime();
 
     // Clear the graph when switching presets (if it exists)
     if (this.configurableGraph) {

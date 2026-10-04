@@ -21,12 +21,13 @@ import {
   DerivedProperty,
   type EnumerationProperty,
   Property,
+  type TProperty,
   type TReadOnlyProperty,
 } from "scenerystack/axon";
 import { Bounds2, type Range, Vector2 } from "scenerystack/dot";
 import { optionize } from "scenerystack/phet-core";
 import type { ModelViewTransform2 } from "scenerystack/phetcommon";
-import { HBox, KeyboardListener, type Node, Text, VBox } from "scenerystack/scenery";
+import { HBox, KeyboardListener, Node, Text, VBox } from "scenerystack/scenery";
 import {
   InfoButton,
   MeasuringTapeNode,
@@ -70,6 +71,7 @@ import { VectorControlPanel } from "./VectorControlPanel.js";
 export type TimeControllableModel = {
   isPlayingProperty: BooleanProperty;
   timeSpeedProperty: EnumerationProperty<TimeSpeed>;
+  timeProperty: TProperty<number>;
   reset(): void;
   step(dt: number, forceStep?: boolean): void;
 };
@@ -109,6 +111,8 @@ export type ControlPanelParameter = {
 
 export abstract class BaseScreenView<T extends TimeControllableModel> extends ScreenView {
   protected readonly model: T;
+  private lastModelTime: number;
+  private isDisposingView = false;
 
   // Store the playing state before auto-pause so we can restore it
   private wasPlayingBeforeHidden: boolean = false;
@@ -161,6 +165,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     );
     super(options);
     this.model = model;
+    this.lastModelTime = model.timeProperty.value;
 
     // Initialize vector visualization properties with provided initial values
     this.showVelocityProperty = new BooleanProperty(options.showVelocity);
@@ -172,6 +177,57 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
 
     // Set up accessibility listeners for state changes
     this.setupAccessibilityListeners();
+  }
+
+  protected linkProperty<V>(property: TReadOnlyProperty<V>, listener: (value: V) => void): void {
+    property.link(listener);
+    this.disposeEmitter.addListener(() => property.unlink(listener));
+  }
+
+  protected lazyLinkProperty<V>(property: TReadOnlyProperty<V>, listener: (value: V) => void): void {
+    property.lazyLink(listener);
+    this.disposeEmitter.addListener(() => property.unlink(listener));
+  }
+
+  protected addDisposableInputListener(
+    node: Node,
+    listener: Parameters<Node["addInputListener"]>[0] & { dispose(): void },
+  ): void {
+    node.addInputListener(listener);
+    this.disposeEmitter.addListener(() => {
+      if (node.hasInputListener(listener)) {
+        node.removeInputListener(listener);
+      }
+      listener.dispose();
+    });
+  }
+
+  public override setPDOMOrder(order: Parameters<ScreenView["setPDOMOrder"]>[0]): void {
+    // ScreenView rejects direct ordering, but Node teardown must clear that order.
+    if (this.isDisposingView) {
+      Node.prototype.setPDOMOrder.call(this, order);
+    } else {
+      super.setPDOMOrder(order);
+    }
+  }
+
+  public override dispose(): void {
+    // Scenery nodes do not automatically dispose their descendants.
+    for (const child of [...this.children].reverse()) {
+      child.disposeSubtree();
+    }
+    this.infoDialog?.disposeSubtree();
+    this.isDisposingView = true;
+    super.dispose();
+    this.stopwatch?.dispose();
+    this.showDistanceToolProperty.dispose();
+    this.showProtractorProperty.dispose();
+    this.showStopwatchProperty.dispose();
+    this.showGridProperty?.dispose();
+    this.showVelocityProperty.dispose();
+    this.showForceProperty.dispose();
+    this.showAccelerationProperty.dispose();
+    this.presetProperty?.dispose();
   }
 
   /**
@@ -192,15 +248,15 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       multiplier: 1,
     });
 
-    // tool checkbox visibility properties
-    this.showDistanceToolProperty = new BooleanProperty(false);
-    this.showProtractorProperty = new BooleanProperty(false);
-    this.showStopwatchProperty = new BooleanProperty(false);
-
     // Position measuring tape near the toolbox at bottom left
     const baseLocation = new Vector2(this.layoutBounds.minX + 300, this.layoutBounds.maxY - 20);
     const basePositionProperty = new Property(modelViewTransform.viewToModelPosition(baseLocation));
     const tipPositionProperty = new Property(basePositionProperty.value.plus(new Vector2(1, 0)));
+    this.disposeEmitter.addListener(() => {
+      unitsProperty.dispose();
+      basePositionProperty.dispose();
+      tipPositionProperty.dispose();
+    });
 
     // Convert drag bounds from view to model coordinates
     const modelDragBounds = new Bounds2(
@@ -249,18 +305,20 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       isVisible: this.showStopwatchProperty.value,
     });
 
+    const stopwatchDragBoundsProperty = new Property(this.layoutBounds);
+    this.disposeEmitter.addListener(() => stopwatchDragBoundsProperty.dispose());
     this.stopwatchNode = new StopwatchNode(this.stopwatch, {
-      dragBoundsProperty: new Property(this.layoutBounds),
+      dragBoundsProperty: stopwatchDragBoundsProperty,
       visibleProperty: this.showStopwatchProperty,
     });
     this.addChild(this.stopwatchNode);
 
     // Bidirectional link between showStopwatchProperty and stopwatch visibility
-    this.showStopwatchProperty.link((visible) => {
+    this.linkProperty(this.showStopwatchProperty, (visible) => {
       this.stopwatch!.isVisibleProperty.value = visible;
     });
 
-    this.stopwatch.isVisibleProperty.link((visible) => {
+    this.linkProperty(this.stopwatch.isVisibleProperty, (visible) => {
       this.stopwatchNode!.visible = visible;
     });
   }
@@ -282,9 +340,10 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     const gridScaleLabel = new Property(
       visualizationLabels.gridScaleLabelStringProperty.value.replace("{{value}}", gridSpacing.toString()),
     );
-    visualizationLabels.gridScaleLabelStringProperty.link((template: string) => {
+    this.linkProperty(visualizationLabels.gridScaleLabelStringProperty, (template: string) => {
       gridScaleLabel.value = template.replace("{{value}}", gridSpacing.toString());
     });
+    this.disposeEmitter.addListener(() => gridScaleLabel.dispose());
 
     this.sceneGridNode = new SceneGridNode(modelViewTransform, bounds, {
       gridSpacing: gridSpacing,
@@ -393,6 +452,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
 
     // Create derived property: stepper buttons enabled only when paused
     const stepperEnabledProperty = new DerivedProperty([this.model.isPlayingProperty], (isPlaying) => !isPlaying);
+    this.disposeEmitter.addListener(() => stepperEnabledProperty.dispose());
 
     // Time controls (play/pause and speed)
     const timeControlNode = new TimeControlNode(this.model.isPlayingProperty, {
@@ -485,7 +545,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     // Add comprehensive keyboard shortcuts for accessibility
     // Using global keyboard listener so shortcuts work regardless of focus
     const a11yStrings = this.getA11yStrings();
-    KeyboardListener.createGlobal(this, {
+    const keyboardListener = KeyboardListener.createGlobal(this, {
       keys: [
         ...OscillationsAndChaosHotkeyData.RESET_KEYS,
         ...OscillationsAndChaosHotkeyData.PLAY_PAUSE_KEYS,
@@ -518,6 +578,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
         }
       },
     });
+    this.disposeEmitter.addListener(() => keyboardListener.dispose());
   }
 
   /**
@@ -546,12 +607,23 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
 
     // Listen for visibility changes
     document.addEventListener("visibilitychange", handleVisibilityChange);
+    this.disposeEmitter.addListener(() => document.removeEventListener("visibilitychange", handleVisibilityChange));
+  }
+
+  /**
+   * Restart simulation time at zero (e.g. when applying a preset) without the view
+   * treating the jump as a backward step for the stopwatch or graph.
+   */
+  protected restartModelTime(): void {
+    this.model.timeProperty.value = 0;
+    this.lastModelTime = 0;
   }
 
   /**
    * Reset method that subclasses can override to add custom reset behavior.
    */
   public reset(): void {
+    this.lastModelTime = this.model.timeProperty.value;
     // Reset the stopwatch if it exists
     if (this.stopwatch) {
       this.stopwatch.reset();
@@ -583,18 +655,25 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
    * Step method that subclasses should override to update view-specific elements.
    * @param dt - Time step in seconds (can be negative for backward stepping)
    */
-  public override step(dt: number): void {
-    // Step the stopwatch if it exists and is running (only for forward time)
-    if (this.stopwatch && dt > 0) {
-      this.stopwatch.step(dt);
+  public override step(_dt: number): void {
+    const time = this.model.timeProperty.value;
+    const elapsed = time - this.lastModelTime;
+    this.lastModelTime = time;
+    if (elapsed === 0) {
+      return;
     }
 
-    // Add data point to graph if it exists (only for forward time)
-    if (this.configurableGraph && dt > 0) {
-      this.configurableGraph.addDataPoint();
+    if (this.stopwatch) {
+      this.stopwatch.setTime(Math.max(0, this.stopwatch.timeProperty.value + elapsed));
     }
 
-    // Subclasses can override to add their own step behavior
+    if (this.configurableGraph) {
+      // Stepping backward discards only the points from the abandoned future.
+      if (elapsed < 0) {
+        this.configurableGraph.discardDataFrom(time);
+      }
+      this.configurableGraph.addDataPoint(time);
+    }
   }
 
   /**
@@ -604,7 +683,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     const a11yStrings = this.getA11yStrings();
 
     // Announce when play state changes
-    this.model.isPlayingProperty.lazyLink((isPlaying) => {
+    this.lazyLinkProperty(this.model.isPlayingProperty, (isPlaying) => {
       const announcement = isPlaying
         ? a11yStrings.simulationStartedStringProperty.value
         : a11yStrings.simulationPausedStringProperty.value;
@@ -612,7 +691,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     });
 
     // Announce when speed changes
-    this.model.timeSpeedProperty.lazyLink((speed) => {
+    this.lazyLinkProperty(this.model.timeSpeedProperty, (speed) => {
       const template = a11yStrings.speedChangedStringProperty.value;
       const announcement = template.replace("{{speed}}", speed.name);
       SimulationAnnouncer.announceSimulationState(announcement);
@@ -746,7 +825,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     this.presetProperty = new Property<Preset | "Custom">(presets[0]!);
 
     // Listen for preset changes to apply configuration
-    this.presetProperty.link((preset) => {
+    this.linkProperty(this.presetProperty, (preset) => {
       if (preset !== "Custom" && !this.isApplyingPreset) {
         applyPresetCallback(preset);
       }
@@ -760,7 +839,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     };
 
     for (const property of detectCustomChangeProperties) {
-      property.lazyLink(detectCustomChange);
+      this.lazyLinkProperty(property, detectCustomChange);
     }
   }
 

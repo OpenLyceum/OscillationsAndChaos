@@ -114,7 +114,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     this.addChild(pendulumLabProtractor);
 
     // Link visibility
-    this.showProtractorProperty.link((visible: boolean) => {
+    this.linkProperty(this.showProtractorProperty, (visible: boolean) => {
       pendulumLabProtractor.visible = visible;
     });
 
@@ -159,7 +159,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     this.addChild(this.bobReferenceDot);
 
     // Link mass to visual size
-    this.model.massProperty.link((mass) => {
+    this.linkProperty(this.model.massProperty, (mass) => {
       this.updateBobSize(mass);
     });
 
@@ -171,7 +171,8 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
       const announcement = template.replace("{{angle}}", angleDegrees);
       SimulationAnnouncer.announceDragInteraction(announcement);
     };
-    this.bobNode.addInputListener(
+    this.addDisposableInputListener(
+      this.bobNode,
       new RichDragListener({
         dragListenerOptions: {
           translateNode: false,
@@ -206,8 +207,8 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     );
 
     // Link model to view
-    this.model.angleProperty.link(this.updateVisualization.bind(this));
-    this.model.lengthProperty.link(this.updateVisualization.bind(this));
+    this.linkProperty(this.model.angleProperty, this.updateVisualization.bind(this));
+    this.linkProperty(this.model.lengthProperty, this.updateVisualization.bind(this));
 
     // Initialize vector visibility properties (from base class)
     this.showVelocityProperty.setInitialValue(true);
@@ -237,7 +238,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     this.addChild(controlPanel);
 
     // Listen for preset changes to apply configuration
-    this.presetProperty.link((preset) => {
+    this.linkProperty(this.presetProperty, (preset) => {
       if (preset !== "Custom" && !this.isApplyingPreset) {
         this.applyPreset(preset);
       }
@@ -249,28 +250,28 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
         this.presetProperty.value = "Custom";
       }
     };
-    this.model.lengthProperty.lazyLink(detectCustomChange);
-    this.model.massProperty.lazyLink(detectCustomChange);
-    this.model.gravityProperty.lazyLink(detectCustomChange);
-    this.model.dampingProperty.lazyLink(detectCustomChange);
+    this.lazyLinkProperty(this.model.lengthProperty, detectCustomChange);
+    this.lazyLinkProperty(this.model.massProperty, detectCustomChange);
+    this.lazyLinkProperty(this.model.gravityProperty, detectCustomChange);
+    this.lazyLinkProperty(this.model.dampingProperty, detectCustomChange);
 
     // Add accessibility announcements for parameter changes
-    this.model.lengthProperty.lazyLink((length) => {
+    this.lazyLinkProperty(this.model.lengthProperty, (length) => {
       const template = this.a11yStrings.lengthChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(length, 1));
       SimulationAnnouncer.announceParameterChange(announcement);
     });
-    this.model.massProperty.lazyLink((mass) => {
+    this.lazyLinkProperty(this.model.massProperty, (mass) => {
       const template = this.a11yStrings.massChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(mass, 1));
       SimulationAnnouncer.announceParameterChange(announcement);
     });
-    this.model.gravityProperty.lazyLink((gravity) => {
+    this.lazyLinkProperty(this.model.gravityProperty, (gravity) => {
       const template = this.a11yStrings.gravityChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(gravity, 1));
       SimulationAnnouncer.announceParameterChange(announcement);
     });
-    this.model.dampingProperty.lazyLink((damping) => {
+    this.lazyLinkProperty(this.model.dampingProperty, (damping) => {
       const template = this.a11yStrings.dampingChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(damping, 2));
       SimulationAnnouncer.announceParameterChange(announcement);
@@ -424,7 +425,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
 
     // Link text color property to formula nodes
     // FormulaNode extends DOM, so we need to set the color via CSS
-    OscillationsAndChaosColors.textColorProperty.link((color) => {
+    this.linkProperty(OscillationsAndChaosColors.textColorProperty, (color) => {
       equation.element.style.color = color.toCSS();
       variablesList.element.style.color = color.toCSS();
     });
@@ -514,7 +515,6 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
 
   public override step(dt: number): void {
     super.step(dt); // Step the stopwatch, graph, and other base view components
-    this.model.step(dt);
 
     // Update vector visualizations
     this.updateVectors();
@@ -598,7 +598,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     this.model.angularVelocityProperty.value = 0;
 
     // Reset simulation time only (don't reset the parameters we just set!)
-    this.model.timeProperty.value = 0;
+    this.restartModelTime();
 
     // Clear graph when switching presets (if it exists)
     if (this.configurableGraph) {

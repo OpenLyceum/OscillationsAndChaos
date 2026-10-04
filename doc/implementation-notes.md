@@ -100,3 +100,22 @@ All solvers use interleaved state vectors: `[position1, velocity1, position2, ve
 Forward and backward integration subdivide the interval using its magnitude and apply its sign to each substep.
 When PEFRL is selected, the double pendulum uses RK4 at the nominal timestep instead: its velocity-dependent
 coupling is not compatible with the separable position/velocity splitting required by PEFRL.
+
+The spring and single-pendulum models also use RK4 whenever any damping coefficient is nonzero.
+Compatibility is checked on each model step, so removing damping restores PEFRL immediately.
+Both solvers follow the current nominal timestep preference.
+
+Spring positions are unbounded integration state. Pointer and keyboard dragging constrain positions
+to −5–5 m in the view. A mass already outside that region can move smoothly inward without snapping;
+outward dragging is constrained at its current position. The state mapper writes solver results without clamping.
+
+### Stepping and disposal
+
+SceneryStack advances each screen model once per frame; views only update rendering and tools.
+The shared view uses changes in model time for stopwatch updates and graph sampling, including
+forced steps while paused. Paused frames add no samples. Backward steps rewind a running stopwatch
+without going below zero and clear graph data from the old future before sampling the new state.
+
+Dispose views before their models. Views unlink their property and document listeners, dispose
+owned tools, and dispose their node trees. Models unlink global solver preferences and dispose
+state, parameter, and derived properties.

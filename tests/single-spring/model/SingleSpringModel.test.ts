@@ -5,7 +5,7 @@ describe("SingleSpringModel", () => {
   let model: SingleSpringModel;
 
   afterEach(() => {
-    model.reset();
+    model.dispose();
   });
 
   it("constructs with default preset state", () => {
@@ -49,15 +49,18 @@ describe("SingleSpringModel", () => {
     expect(model.velocityProperty.value).not.toBeCloseTo(0, 6);
   });
 
-  it("clamps integrated position to the NumberProperty range", () => {
+  it("preserves undamped motion beyond the former position limit", () => {
     model = new SingleSpringModel();
-    model.isPlayingProperty.value = false;
-    model.positionProperty.value = 5;
-    model.velocityProperty.value = 20;
+    model.dampingProperty.value = 0;
+    const initialEnergy = model.totalEnergyProperty.value;
+    for (let i = 0; i < 90; i++) {
+      model.step(0.02, true);
+    }
 
-    model.step(0.05, true);
-
-    expect(model.positionProperty.value).toBeLessThanOrEqual(5);
-    expect(model.positionProperty.value).toBeGreaterThanOrEqual(-5);
+    const equilibrium = (5 * 9.8) / 15;
+    const expectedPosition = equilibrium + (1 - equilibrium) * Math.cos(Math.sqrt(15 / 5) * 1.8);
+    expect(model.positionProperty.value).toBeGreaterThan(5);
+    expect(model.positionProperty.value).toBeCloseTo(expectedPosition, 8);
+    expect(model.totalEnergyProperty.value).toBeCloseTo(initialEnergy, 8);
   });
 });

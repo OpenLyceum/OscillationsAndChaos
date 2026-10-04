@@ -10,7 +10,7 @@
  * - position2 (x2), velocity2 (v2) - positive downward from natural length
  */
 
-import { DerivedProperty, NumberProperty, type TReadOnlyProperty } from "scenerystack/axon";
+import { DerivedProperty, NumberProperty, type ReadOnlyProperty } from "scenerystack/axon";
 import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
@@ -40,24 +40,20 @@ export class DoubleSpringModel extends BaseModel {
   public readonly naturalLength2Property: NumberProperty;
 
   // Computed values
-  public readonly acceleration1Property: TReadOnlyProperty<number>;
-  public readonly acceleration2Property: TReadOnlyProperty<number>;
-  public readonly totalEnergyProperty: TReadOnlyProperty<number>;
+  public readonly acceleration1Property: ReadOnlyProperty<number>;
+  public readonly acceleration2Property: ReadOnlyProperty<number>;
+  public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
   public constructor() {
     super();
 
     // Initialize state to match first preset ("Symmetric")
     // Positions match first preset initial displacement
-    this.position1Property = new NumberProperty(1.0, {
-      range: new Range(-5, 5),
-    });
+    this.position1Property = new NumberProperty(1.0);
 
     this.velocity1Property = new NumberProperty(0.0);
 
-    this.position2Property = new NumberProperty(1.5, {
-      range: new Range(-5, 5),
-    });
+    this.position2Property = new NumberProperty(1.5);
 
     this.velocity2Property = new NumberProperty(0.0);
 
@@ -153,6 +149,10 @@ export class DoubleSpringModel extends BaseModel {
     ]);
   }
 
+  protected override isPEFRLCompatible(): boolean {
+    return this.damping1Property.value === 0 && this.damping2Property.value === 0;
+  }
+
   /**
    * Get the current state vector for physics integration.
    * @returns [position1, velocity1, position2, velocity2]
@@ -200,9 +200,28 @@ export class DoubleSpringModel extends BaseModel {
     derivatives[3]! = (-k2 * (x2 - x1) - b2 * v2 + m2 * g) / m2;
   }
 
-  /**
-   * Reset the model to initial conditions.
-   */
+  /** Release owned properties and global preference listeners. */
+  public override dispose(): void {
+    this.totalEnergyProperty.dispose();
+    this.acceleration2Property.dispose();
+    this.acceleration1Property.dispose();
+    this.position1Property.dispose();
+    this.velocity1Property.dispose();
+    this.position2Property.dispose();
+    this.velocity2Property.dispose();
+    this.mass1Property.dispose();
+    this.mass2Property.dispose();
+    this.springConstant1Property.dispose();
+    this.springConstant2Property.dispose();
+    this.damping1Property.dispose();
+    this.damping2Property.dispose();
+    this.gravityProperty.dispose();
+    this.naturalLength1Property.dispose();
+    this.naturalLength2Property.dispose();
+    super.dispose();
+  }
+
+  /** Reset the model to initial conditions. */
   public reset(): void {
     this.position1Property.reset();
     this.velocity1Property.reset();

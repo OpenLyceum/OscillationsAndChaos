@@ -143,10 +143,10 @@ export class AdaptiveRK45Solver implements ODESolver {
     }
     derivativeFn(this.tempState, this.k6, time + (7 * dt) / 8);
 
-    // 4th order solution
-    const state4 = new Array(n);
+    // 5th order solution
+    const higherOrderState = new Array(n);
     for (let i = 0; i < n; i++) {
-      state4[i]! =
+      higherOrderState[i]! =
         state[i]! +
         ((37 * this.k1[i]!) / 378 +
           (250 * this.k3[i]!) / 621 +
@@ -155,10 +155,10 @@ export class AdaptiveRK45Solver implements ODESolver {
           dt;
     }
 
-    // 5th order solution
-    const state5 = new Array(n);
+    // 4th order solution
+    const lowerOrderState = new Array(n);
     for (let i = 0; i < n; i++) {
-      state5[i]! =
+      lowerOrderState[i]! =
         state[i]! +
         ((2825 * this.k1[i]!) / 27648 +
           (18575 * this.k3[i]!) / 48384 +
@@ -171,18 +171,18 @@ export class AdaptiveRK45Solver implements ODESolver {
     // Estimate error (difference between 4th and 5th order solutions)
     let maxError = 0;
     for (let i = 0; i < n; i++) {
-      this.error[i]! = Math.abs(state5[i]! - state4[i]!);
+      this.error[i]! = Math.abs(lowerOrderState[i]! - higherOrderState[i]!);
       maxError = Math.max(maxError, this.error[i]!);
     }
 
     // Validate computed results
     assert?.(Number.isFinite(maxError), "computed error must be finite");
     assert?.(
-      state5.every((v) => Number.isFinite(v)),
+      higherOrderState.every((v) => Number.isFinite(v)),
       "all computed state values must be finite",
     );
 
-    return { error: maxError, newState: state5 };
+    return { error: maxError, newState: higherOrderState };
   }
 
   /**
