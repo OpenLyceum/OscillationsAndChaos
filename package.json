@@ -44,7 +44,7 @@
   },
   "dependencies": {
     "scenerystack": "^3.0.0",
-    "katex": "^0.18.9"
+    "katex": "^0.19.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.5.14",
