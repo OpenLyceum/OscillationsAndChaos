@@ -18,7 +18,7 @@ import { SpringVisualizationType } from "../common/view/SpringVisualizationType.
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
 import oscillationsAndChaosQueryParameters from "./oscillationsAndChaosQueryParameters.js";
 
-export class OscillationsAndChaosPreferencesModel {
+class OscillationsAndChaosPreferencesModel {
   /**
    * Whether to automatically pause the simulation when the browser tab is hidden.
    * When enabled, the simulation will pause when switching tabs or minimizing the browser,

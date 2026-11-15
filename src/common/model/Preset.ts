@@ -5,7 +5,7 @@
 
 import type { ReadOnlyProperty } from "scenerystack";
 
-export type PresetConfiguration = {
+type PresetConfiguration = {
   [key: string]: number;
 };
 

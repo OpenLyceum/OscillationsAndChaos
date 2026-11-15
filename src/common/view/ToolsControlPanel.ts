@@ -20,7 +20,7 @@ import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 /**
  * Configuration for a single tool
  */
-export interface ToolConfig {
+interface ToolConfig {
   showProperty: BooleanProperty;
   labelProperty: ReadOnlyProperty<string>;
   a11yStrings: {

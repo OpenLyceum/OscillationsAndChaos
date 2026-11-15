@@ -21,7 +21,7 @@ import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 /**
  * Configuration for a single vector type (velocity, force, or acceleration)
  */
-export interface VectorConfig {
+interface VectorConfig {
   showProperty: BooleanProperty;
   labelProperty: ReadOnlyProperty<string>;
   a11yStrings: {

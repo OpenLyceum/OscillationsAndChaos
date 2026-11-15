@@ -23,7 +23,7 @@ import { PANEL_MARGIN_X, PANEL_MARGIN_Y, SPACING_MEDIUM, SPACING_SMALL } from ".
 /**
  * Configuration for a single parameter control
  */
-export interface ParameterControlConfig {
+interface ParameterControlConfig {
   /** Label for the control */
   labelProperty: TReadOnlyProperty<string>;
   /** Property being controlled */
