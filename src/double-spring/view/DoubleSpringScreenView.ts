@@ -12,6 +12,7 @@ import { Line, type Node, Rectangle, RichDragListener, RichText, Text, VBox } fr
 import { FormulaNode, PhetFont } from "scenerystack/scenery-phet";
 import type { ScreenSummaryContent } from "scenerystack/sim";
 import type { Preset } from "../../common/model/Preset.js";
+import { SpringVisualizationType } from "../../common/SpringVisualizationType.js";
 import { constrainSpringDragPosition } from "../../common/util/constrainSpringDragPosition.js";
 import SimulationAnnouncer from "../../common/util/SimulationAnnouncer.js";
 import { BaseScreenView, type BaseScreenViewOptions } from "../../common/view/BaseScreenView.js";
@@ -32,7 +33,6 @@ import {
   SPRING_LINE_WIDTH,
   SPRING_RIGHT_END_LENGTH,
 } from "../../common/view/SpringVisualizationConstants.js";
-import { SpringVisualizationType } from "../../common/view/SpringVisualizationType.js";
 import { SPACING_LARGE } from "../../common/view/UILayoutConstants.js";
 import type { VectorNode } from "../../common/view/VectorNode.js";
 import { VectorNodeFactory } from "../../common/view/VectorNodeFactory.js";

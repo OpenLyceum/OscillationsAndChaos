@@ -90,7 +90,6 @@ view/
 ├── PresetSelectorFactory.ts      # Preset scenario selector
 ├── SpringNode.ts                 # Classic spring visualization
 ├── ParametricSpringNode.ts       # Parametric spring visualization
-├── SpringVisualizationType.ts    # Spring rendering mode enum
 ├── SpringVisualizationConstants.ts
 ├── VectorNode.ts                 # Vector arrow visualization
 ├── VectorNodeFactory.ts          # Factory for creating vector nodes
@@ -108,6 +107,8 @@ view/
 ```
 
 Screen icons for all four screens live in `src/common/OscillationsAndChaosScreenIcons.ts`.
+The shared spring-rendering preference values live in `src/common/SpringVisualizationType.ts`
+so preferences and models do not depend on the view layer.
 
 #### Utilities (`src/common/util/`)
 

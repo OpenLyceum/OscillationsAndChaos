@@ -13,7 +13,7 @@ import { PhetFont } from "scenerystack/scenery-phet";
 import { Checkbox, ComboBox, VerticalAquaRadioButtonGroup } from "scenerystack/sun";
 import { NominalTimeStep } from "../common/model/NominalTimeStep.js";
 import { SolverType } from "../common/model/SolverType.js";
-import { SpringVisualizationType } from "../common/view/SpringVisualizationType.js";
+import { SpringVisualizationType } from "../common/SpringVisualizationType.js";
 import { StringManager } from "../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";

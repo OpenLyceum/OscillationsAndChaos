@@ -42,8 +42,8 @@ import {
   createPendulumIcon,
   createSingleSpringIcon,
 } from "./common/OscillationsAndChaosScreenIcons.js";
+import { SpringVisualizationType } from "./common/SpringVisualizationType.js";
 import SimulationAnnouncer from "./common/util/SimulationAnnouncer.js";
-import { SpringVisualizationType } from "./common/view/SpringVisualizationType.js";
 import { DoublePendulumScreen } from "./double-pendulum/DoublePendulumScreen.js";
 import { DoubleSpringScreen } from "./double-spring/DoubleSpringScreen.js";
 import { StringManager } from "./i18n/StringManager.js";
