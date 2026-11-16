@@ -41,8 +41,8 @@ export class AdaptiveRK45Solver implements ODESolver {
 
   // Default timestep and tolerance
   private fixedTimeStep: number = 0.01;
-  private tolerance: number = 1e-6;
-  private minStepSize: number = 1e-6;
+  private readonly tolerance: number = 1e-6;
+  private readonly minStepSize: number = 1e-6;
   private maxStepSize: number = 0.1;
 
   /**

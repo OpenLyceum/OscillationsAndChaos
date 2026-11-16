@@ -39,13 +39,13 @@ type ParametricSpringNodeOptions = NodeOptions & {
 export class ParametricSpringNode extends Node {
   private readonly frontPath: Path;
   private readonly backPath: Path;
-  private loops: number;
+  private readonly loops: number;
   private radius: number;
-  private aspectRatio: number;
-  private pointsPerLoop: number;
+  private readonly aspectRatio: number;
+  private readonly pointsPerLoop: number;
   private lineWidth: number;
-  private phase: number;
-  private deltaPhase: number;
+  private readonly phase: number;
+  private readonly deltaPhase: number;
   private xScale: number;
   private readonly leftEndLength: number;
   private readonly rightEndLength: number;

@@ -59,8 +59,8 @@ export class DormandPrince87Solver implements ODESolver {
 
   // Solver parameters
   private fixedTimeStep: number = 0.001;
-  private tolerance: number = 1e-8; // Very tight tolerance for high accuracy
-  private minStepSize: number = 1e-8;
+  private readonly tolerance: number = 1e-8; // Very tight tolerance for high accuracy
+  private readonly minStepSize: number = 1e-8;
   private maxStepSize: number = 0.1;
 
   /**
