@@ -28,7 +28,7 @@ Shared code uses the `OscillationsAndChaos` prefix. Concept-named folders, no `-
 | Preferences | `src/preferences/OscillationsAndChaosPreferencesModel.ts`, `OscillationsAndChaosAudioPreferencesNode.ts`, `oscillationsAndChaosQueryParameters.ts` |
 | Per-screen physics | `src/*/model/*Model.ts` |
 | Per-screen views | `src/*/view/*ScreenView.ts` |
-| Internal dev notes | `src/doc/PROJECT_STRUCTURE.md`, `src/doc/SCENERYSTACK_PATTERNS.md` |
+| Architecture and shared patterns | `doc/implementation-notes.md`, [Baton skills](https://github.com/OpenLyceum/Baton/tree/main/skills) |
 
 ## Model
 

@@ -91,8 +91,9 @@ register in `main.ts`, add locale keys and `StringManager` getters. See [Scenery
 
 ## Internal developer notes
 
-Additional structure notes live in `src/doc/PROJECT_STRUCTURE.md` and
-`src/doc/SCENERYSTACK_PATTERNS.md` (not shipped to educators).
+Shared structure and framework patterns live in the
+[org guide](https://github.com/OpenLyceum/.github/blob/main/AGENTS.md) and
+[Baton skills](https://github.com/OpenLyceum/Baton/tree/main/skills).
 
 ### Solver compatibility
 
