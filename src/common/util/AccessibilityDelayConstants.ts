@@ -1,16 +1,10 @@
 /**
- * Constants for voicing announcement delays (in milliseconds).
- * These delays help prevent announcement spam during rapid parameter changes.
+ * Accessibility announcement delays.
+ *
+ * Re-exported from the root `OscillationsAndChaosConstants` so existing
+ * util/view imports keep their historical path.
  */
-
-/**
- * Delay for parameter change announcements (ms)
- * Wait for rapid changes (e.g., slider drag events) to stabilize
- */
-export const PARAMETER_CHANGE_ANNOUNCEMENT_DELAY = 300;
-
-/**
- * Delay for graph change announcements (ms)
- * Shorter delay for graph updates since they're less frequent
- */
-export const GRAPH_CHANGE_ANNOUNCEMENT_DELAY = 200;
+export {
+  GRAPH_CHANGE_ANNOUNCEMENT_DELAY,
+  PARAMETER_CHANGE_ANNOUNCEMENT_DELAY,
+} from "../../OscillationsAndChaosConstants.js";

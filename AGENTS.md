@@ -52,8 +52,9 @@ per-screen `get*ScreenSummaryStrings()` / `get*VoicingStrings()` accessors.
 
 ## Compliance carve-outs
 
-- **Nested constants:** numerics split across topical files under `src/common/view/` and
-  `src/common/util/` — no root `OscillationsAndChaosConstants.ts`.
+- **View-side topical constants:** layout/visualization numerics stay under `src/common/view/*Constants.ts`.
+  Shared accessibility delays live in root `OscillationsAndChaosConstants.ts` (re-exported from
+  `src/common/util/AccessibilityDelayConstants.ts`).
 - **Extra `src/` root entries:** `src/assets/` (bundled screenshot), `src/doc/` (internal dev
   notes), `vite-env.d.ts`.
 - **Domain clock:** `BaseModel` owns play/pause and forced stepping instead of composing fleet-standard `TimeModel`.
