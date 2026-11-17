@@ -47,8 +47,8 @@
     "test:architecture": "node --test tests/*.node-test.ts"
   },
   "dependencies": {
-    "scenerystack": "^3.0.0",
-    "katex": "^0.19.1"
+    "katex": "^0.19.1",
+    "scenerystack": "^3.0.0"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.6.7",
