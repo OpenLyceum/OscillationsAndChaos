@@ -1,3 +1,4 @@
+import { Vector2 } from "scenerystack/dot";
 import { describe, expect, it, vi } from "vitest";
 import { GraphDataManager } from "../../../src/common/view/graph/GraphDataManager.js";
 
@@ -5,8 +6,12 @@ function createManager() {
   const setSpacing = vi.fn();
   const gridPart = { setSpacing };
   const linePlot = { setDataSet: vi.fn() };
-  const chartTransform = { setModelXRange: vi.fn(), setModelYRange: vi.fn(), modelToViewPosition: vi.fn() };
-  const trailNode = { removeAllChildren: vi.fn(), addChild: vi.fn() };
+  const chartTransform = {
+    setModelXRange: vi.fn(),
+    setModelYRange: vi.fn(),
+    modelToViewPosition: vi.fn(() => Vector2.ZERO),
+  };
+  const trailNode = { children: [] };
   const manager = new GraphDataManager(chartTransform as never, linePlot as never, trailNode as never, 100, {
     verticalGridLineSet: gridPart,
     horizontalGridLineSet: gridPart,
