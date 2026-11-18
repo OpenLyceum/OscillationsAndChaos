@@ -55,8 +55,7 @@ per-screen `get*ScreenSummaryStrings()` / `get*VoicingStrings()` accessors.
 - **View-side topical constants:** layout/visualization numerics stay under `src/common/view/*Constants.ts`.
   Shared accessibility delays live in root `OscillationsAndChaosConstants.ts` (re-exported from
   `src/common/util/AccessibilityDelayConstants.ts`).
-- **Extra `src/` root entries:** `src/assets/` (bundled screenshot), `src/doc/` (internal dev
-  notes), `vite-env.d.ts`.
+- **Extra `src/` root entries:** `src/assets/` (bundled screenshot), `vite-env.d.ts`.
 - **Domain clock:** `BaseModel` owns play/pause and forced stepping instead of composing fleet-standard `TimeModel`.
 - `memory-leak:BaseModel`: abstract; dispose covered via concrete screen models in the suite.
 - **Biome `style.noNonNullAssertion` scoped off** (via `biome.json` `overrides`, an allowed template extend): ODE
