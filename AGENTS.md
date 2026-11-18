@@ -57,7 +57,6 @@ per-screen `get*ScreenSummaryStrings()` / `get*VoicingStrings()` accessors.
   `src/common/util/AccessibilityDelayConstants.ts`).
 - **Extra `src/` root entries:** `src/assets/` (bundled screenshot), `vite-env.d.ts`.
 - **Domain clock:** `BaseModel` owns play/pause and forced stepping instead of composing fleet-standard `TimeModel`.
-- `memory-leak:BaseModel`: abstract; dispose covered via concrete screen models in the suite.
 - **Biome `style.noNonNullAssertion` scoped off** (via `biome.json` `overrides`, an allowed template extend): ODE
   solvers, `BaseModel`, spring/graph view helpers, and the four screen trees keep intentional non-null assertions
   in dense numeric / interaction paths.
