@@ -23,6 +23,7 @@ import {
 import { FormulaNode, PhetFont } from "scenerystack/scenery-phet";
 import type { ScreenSummaryContent } from "scenerystack/sim";
 import type { Preset } from "../../common/model/Preset.js";
+import OscillationsAndChaosHotkeyData from "../../common/OscillationsAndChaosHotkeyData.js";
 import SimulationAnnouncer from "../../common/util/SimulationAnnouncer.js";
 import { BaseScreenView, type BaseScreenViewOptions } from "../../common/view/BaseScreenView.js";
 import {
@@ -538,14 +539,11 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
       ],
     );
 
-    // Add additional keyboard shortcut for trail toggle
+    // Trail toggle (T). Keys come from the HotkeyData the keyboard-help row renders.
     const trailKeyboardListener = new KeyboardListener({
-      keys: ["t"],
-      fire: (_event, keysPressed) => {
-        if (keysPressed === "t") {
-          // Toggle trail visibility with T key
-          this.trailVisibleProperty.value = !this.trailVisibleProperty.value;
-        }
+      keyStringProperties: OscillationsAndChaosHotkeyData.TOGGLE_TRAIL.keyStringProperties,
+      fire: () => {
+        this.trailVisibleProperty.value = !this.trailVisibleProperty.value;
       },
     });
     this.addDisposableInputListener(this, trailKeyboardListener);

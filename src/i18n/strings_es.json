@@ -307,7 +307,8 @@
     "stepForward": "Avanzar un paso (en pausa)",
     "resetZoom": "Restablecer el zoom al escalado automático",
     "zoomInOut": "Acercar/Alejar",
-    "panView": "Desplazar la vista"
+    "panView": "Desplazar la vista",
+    "toggleTrail": "Mostrar u ocultar la estela de movimiento"
   },
   "voicing": {
     "singleSpring": {

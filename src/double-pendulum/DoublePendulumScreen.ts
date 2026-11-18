@@ -16,7 +16,7 @@ export class DoublePendulumScreen extends Screen<DoublePendulumModel, DoublePend
       (model) => new DoublePendulumScreenView(model),
       optionize<ScreenOptions, EmptySelfOptions, ScreenOptions>()(
         {
-          createKeyboardHelpNode: () => new OscillationsAndChaosKeyboardHelpContent(),
+          createKeyboardHelpNode: () => new OscillationsAndChaosKeyboardHelpContent({ includeTrailToggle: true }),
         },
         options,
       ),

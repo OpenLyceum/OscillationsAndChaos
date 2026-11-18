@@ -660,6 +660,7 @@ export class StringManager {
     resetZoomStringProperty: ReadOnlyProperty<string>;
     zoomInOutStringProperty: ReadOnlyProperty<string>;
     panViewStringProperty: ReadOnlyProperty<string>;
+    toggleTrailStringProperty: ReadOnlyProperty<string>;
   } {
     return {
       titleStringProperty: stringProperties.keyboardShortcuts.titleStringProperty,
@@ -672,6 +673,7 @@ export class StringManager {
       resetZoomStringProperty: stringProperties.keyboardShortcuts.resetZoomStringProperty,
       zoomInOutStringProperty: stringProperties.keyboardShortcuts.zoomInOutStringProperty,
       panViewStringProperty: stringProperties.keyboardShortcuts.panViewStringProperty,
+      toggleTrailStringProperty: stringProperties.keyboardShortcuts.toggleTrailStringProperty,
     };
   }
 

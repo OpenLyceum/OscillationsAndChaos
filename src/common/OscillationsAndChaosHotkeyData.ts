@@ -3,6 +3,8 @@
  *
  * Single source of truth for the global playback shortcuts. The KeyboardListener
  * in BaseScreenView and the keyboard-help rows both derive from these instances.
+ * TOGGLE_TRAIL is the Double Pendulum screen's trail toggle, bound by a
+ * KeyboardListener on that ScreenView (active while focus is inside the screen).
  */
 
 import { HotkeyData } from "scenerystack/scenery";
@@ -44,6 +46,12 @@ const OscillationsAndChaosHotkeyData = {
     repoName: "oscillations-and-chaos",
     global: true,
     binderName: "Step Forward",
+  }),
+
+  TOGGLE_TRAIL: new HotkeyData({
+    keys: ["t"],
+    repoName: "oscillations-and-chaos",
+    binderName: "Toggle Trail",
   }),
 } as const;
 

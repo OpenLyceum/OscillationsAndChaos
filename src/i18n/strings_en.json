@@ -307,7 +307,8 @@
     "stepForward": "Step forward (when paused)",
     "resetZoom": "Reset zoom to auto-scale",
     "zoomInOut": "Zoom in/out",
-    "panView": "Pan view"
+    "panView": "Pan view",
+    "toggleTrail": "Show or hide the motion trail"
   },
   "voicing": {
     "singleSpring": {

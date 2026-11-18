@@ -307,7 +307,8 @@
     "stepForward": "Avancer d'un pas (en pause)",
     "resetZoom": "Réinitialiser le zoom automatique",
     "zoomInOut": "Zoomer / Dézoomer",
-    "panView": "Déplacer la vue"
+    "panView": "Déplacer la vue",
+    "toggleTrail": "Afficher ou masquer la traînée de mouvement"
   },
   "voicing": {
     "singleSpring": {
