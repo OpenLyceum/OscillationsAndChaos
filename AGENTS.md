@@ -59,9 +59,9 @@ per-screen `get*ScreenSummaryStrings()` / `get*VoicingStrings()` accessors.
   notes), `vite-env.d.ts`.
 - **Domain clock:** `BaseModel` owns play/pause and forced stepping instead of composing fleet-standard `TimeModel`.
 - `memory-leak:BaseModel`: abstract; dispose covered via concrete screen models in the suite.
-- **Biome `style.noNonNullAssertion: off`:** dense canvas/WebGL and numeric paths use intentional
-  non-null assertions; enabling the rule floods lint with noise without improving safety here.
-- **Template drift (Baton `check-template-drift.sh`):** `biome.json` (the `noNonNullAssertion` override above).
+- **Biome `style.noNonNullAssertion` scoped off** (via `biome.json` `overrides`, an allowed template extend): ODE
+  solvers, `BaseModel`, spring/graph view helpers, and the four screen trees keep intentional non-null assertions
+  in dense numeric / interaction paths.
 
 ## Testing
 

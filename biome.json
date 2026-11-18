@@ -83,7 +83,6 @@
         "noCommonJs": "error",
         "noDefaultExport": "off",
         "noExportedImports": "warn",
-        "noNonNullAssertion": "off",
         "noParameterAssign": "error",
         "preset": "recommended",
         "useBlockStatements": "error",
@@ -216,6 +215,30 @@
           },
           "suspicious": {
             "noPlaywrightWaitForTimeout": "error"
+          }
+        }
+      }
+    },
+    {
+      "includes": [
+        "src/common/model/AdaptiveRK45Solver.ts",
+        "src/common/model/BaseModel.ts",
+        "src/common/model/DormandPrince87Solver.ts",
+        "src/common/model/ForestRuthPEFRLSolver.ts",
+        "src/common/model/RungeKuttaSolver.ts",
+        "src/common/view/BaseScreenView.ts",
+        "src/common/view/ParametricSpringNode.ts",
+        "src/common/view/graph/GraphDataManager.ts",
+        "src/common/view/graph/GraphInteractionHandler.ts",
+        "src/double-pendulum/**",
+        "src/double-spring/**",
+        "src/pendulum/**",
+        "src/single-spring/**"
+      ],
+      "linter": {
+        "rules": {
+          "style": {
+            "noNonNullAssertion": "off"
           }
         }
       }
