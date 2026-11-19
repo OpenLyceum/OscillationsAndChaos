@@ -19,6 +19,13 @@ export class GraphControlsPanel {
   private readonly yPropertyProperty: Property<PlottableProperty>;
   private readonly graphWidth: number;
 
+  /**
+   * Nodes and derived Properties this panel builds that listen to something
+   * outliving the graph (localized strings, global colors, the combo-box list
+   * parent), released in {@link dispose}.
+   */
+  private readonly disposables: { dispose(): void }[] = [];
+
   public constructor(
     availableProperties: PlottableProperty[],
     xPropertyProperty: Property<PlottableProperty>,
@@ -114,6 +121,8 @@ export class GraphControlsPanel {
       fill: OscillationsAndChaosColors.textColorProperty,
     });
 
+    this.disposables.push(xComboBox, yComboBox, leftParen, vsText, rightParen);
+
     // Arrange in horizontal layout: (Y vs X)
     return new HBox({
       spacing: 3,
@@ -139,7 +148,19 @@ export class GraphControlsPanel {
       cursor: "grab",
     });
 
+    // The fill darkens a global color Property, so it has to be let go of
+    // explicitly; otherwise every graph ever built stays on its listener list.
+    this.disposables.push(headerFillProperty);
+
     return headerBar;
+  }
+
+  /** Release the combo boxes, title text and derived Properties built above. */
+  public dispose(): void {
+    for (const disposable of this.disposables) {
+      disposable.dispose();
+    }
+    this.disposables.length = 0;
   }
 
   /**
