@@ -45,6 +45,9 @@ export class AdaptiveRK45Solver implements ODESolver {
   private readonly minStepSize: number = 1e-6;
   private maxStepSize: number = 0.1;
 
+  /** Caps accept/reject iterations so a pathological step cannot hang the frame under fuzz. */
+  private readonly maxSubsteps: number = 10_000;
+
   /**
    * Set the initial/maximum timestep for integration.
    * @param dt - Time step in seconds (must be positive and finite)
@@ -216,8 +219,10 @@ export class AdaptiveRK45Solver implements ODESolver {
     const direction = Math.sign(dt);
     let remainingTime = Math.abs(dt);
     let currentStepSize = Math.min(this.fixedTimeStep, remainingTime);
+    let substeps = 0;
 
-    while (remainingTime > 0) {
+    while (remainingTime > 0 && substeps < this.maxSubsteps) {
+      substeps++;
       // Try a step
       const result = this.stepOnce(state, derivativeFn, currentTime, direction * currentStepSize);
 
