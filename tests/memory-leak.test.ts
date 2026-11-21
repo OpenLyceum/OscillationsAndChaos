@@ -52,6 +52,8 @@ describeDisposalLeaks(
   })),
 );
 
+// ConfigurableGraph.dispose() tears down these owned helpers; they are never constructed alone.
+// memory-leak-covers: GraphControlsPanel (owned by ConfigurableGraph), GraphInteractionHandler
 describe("ConfigurableGraph", () => {
   it("dispose() releases every sim-lifetime Property it listened to, and never links its data", async () => {
     const timeProperty = new Property(0);
