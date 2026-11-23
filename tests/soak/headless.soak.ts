@@ -13,6 +13,7 @@
  */
 
 import { Tandem } from "scenerystack/tandem";
+import { vi } from "vitest";
 import { SolverType } from "../../src/common/model/SolverType.js";
 import {
   createDoublePendulumIcon,
@@ -32,6 +33,10 @@ import { SingleSpringScreen } from "../../src/single-spring/SingleSpringScreen.j
 import { describeHeadlessSoak } from "../helpers/headlessSoak.js";
 
 function buildSim() {
+  // main.ts installs KaTeX as a global for scenery-phet's FormulaNode. Real KaTeX refuses
+  // happy-dom's quirks-mode document, so stub it as the unit tests do.
+  vi.stubGlobal("katex", { render: () => undefined });
+
   const stringManager = StringManager.getInstance();
   const screenNames = stringManager.getScreenNames();
 
