@@ -2,6 +2,7 @@ import type { Vector2 } from "scenerystack/dot";
 import { expect, it, vi } from "vitest";
 import { DoublePendulumModel } from "../../../src/double-pendulum/model/DoublePendulumModel.js";
 import { DoublePendulumScreenView } from "../../../src/double-pendulum/view/DoublePendulumScreenView.js";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 
 // Dialog hosting needs a running Sim; retain its content tree while omitting that host.
 vi.mock("scenerystack/sim", async (importOriginal) => {
@@ -25,7 +26,7 @@ vi.mock("scenerystack/sim", async (importOriginal) => {
 
 it("preserves the trail during pause and removes the abandoned future on rewind", () => {
   vi.stubGlobal("katex", { render: vi.fn() });
-  const model = new DoublePendulumModel();
+  const model = new DoublePendulumModel(new OscillationsAndChaosPreferencesModel());
   const view = new DoublePendulumScreenView(model);
   const points = Reflect.get(view, "trailPoints") as Vector2[];
   const times = Reflect.get(view, "trailTimes") as number[];

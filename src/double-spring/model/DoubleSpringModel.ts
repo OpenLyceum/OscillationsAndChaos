@@ -15,6 +15,7 @@ import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 
 export class DoubleSpringModel extends BaseModel {
   // State variables for mass 1
@@ -44,8 +45,8 @@ export class DoubleSpringModel extends BaseModel {
   public readonly acceleration2Property: ReadOnlyProperty<number>;
   public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
-  public constructor() {
-    super();
+  public constructor(preferences: OscillationsAndChaosPreferencesModel) {
+    super(preferences);
 
     // Initialize state to match first preset ("Symmetric")
     // Positions match first preset initial displacement

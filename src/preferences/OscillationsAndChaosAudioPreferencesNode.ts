@@ -15,10 +15,10 @@ import type { Tandem } from "scenerystack/tandem";
 import { StringManager } from "../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "./OscillationsAndChaosPreferencesModel.js";
+import type { OscillationsAndChaosPreferencesModel } from "./OscillationsAndChaosPreferencesModel.js";
 
 export class OscillationsAndChaosAudioPreferencesNode extends VBox {
-  public constructor(tandem: Tandem) {
+  public constructor(preferences: OscillationsAndChaosPreferencesModel, tandem: Tandem) {
     super({
       align: "left",
       spacing: 12,
@@ -42,7 +42,7 @@ export class OscillationsAndChaosAudioPreferencesNode extends VBox {
     };
 
     const parameterAnnouncementsCheckbox = new Checkbox(
-      oscillationsAndChaosPreferences.announceParameterChangesProperty,
+      preferences.announceParameterChangesProperty,
       new Text(audioStrings.announceParameterChangesStringProperty, {
         font: new PhetFont(16),
         fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
@@ -61,7 +61,7 @@ export class OscillationsAndChaosAudioPreferencesNode extends VBox {
     });
 
     const stateAnnouncementsCheckbox = new Checkbox(
-      oscillationsAndChaosPreferences.announceStateChangesProperty,
+      preferences.announceStateChangesProperty,
       new Text(audioStrings.announceStateChangesStringProperty, {
         font: new PhetFont(16),
         fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
@@ -80,7 +80,7 @@ export class OscillationsAndChaosAudioPreferencesNode extends VBox {
     });
 
     const dragAnnouncementsCheckbox = new Checkbox(
-      oscillationsAndChaosPreferences.announceDragInteractionsProperty,
+      preferences.announceDragInteractionsProperty,
       new Text(audioStrings.announceDragInteractionsStringProperty, {
         font: new PhetFont(16),
         fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,

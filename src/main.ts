@@ -50,12 +50,13 @@ import { StringManager } from "./i18n/StringManager.js";
 import OscillationsAndChaosColors from "./OscillationsAndChaosColors.js";
 import { PendulumScreen } from "./pendulum/PendulumScreen.js";
 import { OscillationsAndChaosAudioPreferencesNode } from "./preferences/OscillationsAndChaosAudioPreferencesNode.js";
-import { oscillationsAndChaosPreferences } from "./preferences/OscillationsAndChaosPreferencesModel.js";
+import { OscillationsAndChaosPreferencesModel } from "./preferences/OscillationsAndChaosPreferencesModel.js";
 import { OscillationsAndChaosSimulationPreferencesNode } from "./preferences/OscillationsAndChaosSimulationPreferencesNode.js";
 import { SingleSpringScreen } from "./single-spring/SingleSpringScreen.js";
 
 onReadyToLaunch(() => {
   const stringManager = StringManager.getInstance();
+  const preferences = new OscillationsAndChaosPreferencesModel(Tandem.PREFERENCES);
   const screenNames = stringManager.getScreenNames();
 
   // Strings for the preference-change announcements below; the preference UI itself lives in
@@ -66,8 +67,8 @@ onReadyToLaunch(() => {
   // Add accessibility announcements for preference changes
   const a11yStrings = stringManager.getA11yStrings();
 
-  oscillationsAndChaosPreferences.solverTypeProperty.lazyLink((solverType) => {
-    if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+  preferences.solverTypeProperty.lazyLink((solverType) => {
+    if (preferences.announceStateChangesProperty.value) {
       let solverName = "";
       switch (solverType) {
         case SolverType.RK4:
@@ -85,24 +86,25 @@ onReadyToLaunch(() => {
       }
       const template = a11yStrings.solverChangedStringProperty.value;
       const announcement = template.replace("{{solver}}", solverName);
-      SimulationAnnouncer.announceSimulationState(announcement);
+      SimulationAnnouncer.announceSimulationState(preferences, announcement);
     }
   });
 
-  oscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
-    if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+  preferences.springVisualizationTypeProperty.lazyLink((springType) => {
+    if (preferences.announceStateChangesProperty.value) {
       const springTypeName =
         springType === SpringVisualizationType.CLASSIC
           ? springTypeNames.classicStringProperty.value
           : springTypeNames.parametricStringProperty.value;
       const template = a11yStrings.springVisualizationChangedStringProperty.value;
       const announcement = template.replace("{{type}}", springTypeName);
-      SimulationAnnouncer.announceSimulationState(announcement);
+      SimulationAnnouncer.announceSimulationState(preferences, announcement);
     }
   });
 
   const screens = [
     new SingleSpringScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.singleSpringStringProperty,
       tandem: Tandem.ROOT.createTandem("singleSpringScreen"),
@@ -111,6 +113,7 @@ onReadyToLaunch(() => {
       navigationBarIcon: createSingleSpringIcon(),
     }),
     new DoubleSpringScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.doubleSpringStringProperty,
       tandem: Tandem.ROOT.createTandem("doubleSpringScreen"),
@@ -119,6 +122,7 @@ onReadyToLaunch(() => {
       navigationBarIcon: createDoubleSpringIcon(),
     }),
     new PendulumScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.pendulumStringProperty,
       tandem: Tandem.ROOT.createTandem("pendulumScreen"),
@@ -127,6 +131,7 @@ onReadyToLaunch(() => {
       navigationBarIcon: createPendulumIcon(),
     }),
     new DoublePendulumScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.doublePendulumStringProperty,
       tandem: Tandem.ROOT.createTandem("doublePendulumScreen"),
@@ -147,7 +152,7 @@ onReadyToLaunch(() => {
       simulationOptions: {
         customPreferences: [
           {
-            createContent: () => new OscillationsAndChaosSimulationPreferencesNode(),
+            createContent: () => new OscillationsAndChaosSimulationPreferencesNode(preferences),
           },
         ],
       },
@@ -162,7 +167,7 @@ onReadyToLaunch(() => {
         customPreferences: [
           {
             createContent: (tandem: Tandem) => {
-              return new OscillationsAndChaosAudioPreferencesNode(tandem);
+              return new OscillationsAndChaosAudioPreferencesNode(preferences, tandem);
             },
             column: "right",
           },

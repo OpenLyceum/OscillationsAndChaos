@@ -169,7 +169,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
       const angleDegrees = StringUtils.toFixedNumberLTR((this.model.angleProperty.value * 180) / Math.PI, 1);
       const template = this.a11yStrings.bobReleasedAtStringProperty.value;
       const announcement = template.replace("{{angle}}", angleDegrees);
-      SimulationAnnouncer.announceDragInteraction(announcement);
+      SimulationAnnouncer.announceDragInteraction(this.model.preferences, announcement);
     };
     this.addDisposableInputListener(
       this.bobNode,
@@ -178,7 +178,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
           translateNode: false,
           start: () => {
             this.isDraggingProperty.value = true;
-            SimulationAnnouncer.announceDragInteraction("Dragging pendulum bob");
+            SimulationAnnouncer.announceDragInteraction(this.model.preferences, "Dragging pendulum bob");
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
@@ -195,7 +195,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
           shiftDragDelta: 0.01,
           start: () => {
             this.isDraggingProperty.value = true;
-            SimulationAnnouncer.announceDragInteraction("Dragging pendulum bob");
+            SimulationAnnouncer.announceDragInteraction(this.model.preferences, "Dragging pendulum bob");
           },
           drag: (_event, listener) => {
             this.model.angleProperty.value += listener.modelDelta.x;
@@ -259,22 +259,22 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     this.lazyLinkProperty(this.model.lengthProperty, (length) => {
       const template = this.a11yStrings.lengthChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(length, 1));
-      SimulationAnnouncer.announceParameterChange(announcement);
+      SimulationAnnouncer.announceParameterChange(this.model.preferences, announcement);
     });
     this.lazyLinkProperty(this.model.massProperty, (mass) => {
       const template = this.a11yStrings.massChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(mass, 1));
-      SimulationAnnouncer.announceParameterChange(announcement);
+      SimulationAnnouncer.announceParameterChange(this.model.preferences, announcement);
     });
     this.lazyLinkProperty(this.model.gravityProperty, (gravity) => {
       const template = this.a11yStrings.gravityChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(gravity, 1));
-      SimulationAnnouncer.announceParameterChange(announcement);
+      SimulationAnnouncer.announceParameterChange(this.model.preferences, announcement);
     });
     this.lazyLinkProperty(this.model.dampingProperty, (damping) => {
       const template = this.a11yStrings.dampingChangedStringProperty.value;
       const announcement = template.replace("{{value}}", StringUtils.toFixedNumberLTR(damping, 2));
-      SimulationAnnouncer.announceParameterChange(announcement);
+      SimulationAnnouncer.announceParameterChange(this.model.preferences, announcement);
     });
 
     // Apply the first preset immediately
@@ -612,7 +612,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
       "{{preset}}",
       `${preset.nameProperty.value}. Pendulum set to ${angleDegrees} degrees`,
     );
-    SimulationAnnouncer.announceParameterChange(announcement);
+    SimulationAnnouncer.announceParameterChange(this.model.preferences, announcement);
 
     this.isApplyingPreset = false;
   }

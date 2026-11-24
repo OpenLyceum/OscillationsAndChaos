@@ -17,10 +17,10 @@ import { SpringVisualizationType } from "../common/SpringVisualizationType.js";
 import { StringManager } from "../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "./OscillationsAndChaosPreferencesModel.js";
+import type { OscillationsAndChaosPreferencesModel } from "./OscillationsAndChaosPreferencesModel.js";
 
 export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
-  public constructor() {
+  public constructor(preferences: OscillationsAndChaosPreferencesModel) {
     const stringManager = StringManager.getInstance();
     const preferencesLabels = stringManager.getPreferencesLabels();
     const solverNames = stringManager.getSolverNames();
@@ -35,7 +35,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
       spacing: 8,
       children: [
         new Checkbox(
-          oscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty,
+          preferences.autoPauseWhenTabHiddenProperty,
           new Text(preferencesLabels.autoPauseWhenTabHiddenStringProperty, {
             font: new PhetFont(16),
             fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
@@ -107,7 +107,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
     ];
 
     const timeStepComboBox = new ComboBox(
-      oscillationsAndChaosPreferences.nominalTimeStepProperty,
+      preferences.nominalTimeStepProperty,
       timeStepComboBoxItems,
       comboBoxListParent,
       {
@@ -145,7 +145,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
           fill: OscillationsAndChaosColors.controlSurfaceTextColorProperty,
         }),
         new VerticalAquaRadioButtonGroup(
-          oscillationsAndChaosPreferences.solverTypeProperty,
+          preferences.solverTypeProperty,
           [
             {
               value: SolverType.RK4,
@@ -254,7 +254,7 @@ export class OscillationsAndChaosSimulationPreferencesNode extends VBox {
 
     // Spring visualization preference
     const springVisualizationRadioButtonGroup = new VerticalAquaRadioButtonGroup(
-      oscillationsAndChaosPreferences.springVisualizationTypeProperty,
+      preferences.springVisualizationTypeProperty,
       [
         {
           value: SpringVisualizationType.CLASSIC,

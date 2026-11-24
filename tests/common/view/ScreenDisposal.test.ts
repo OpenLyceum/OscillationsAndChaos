@@ -26,10 +26,12 @@ vi.mock("scenerystack/sim", async (importOriginal) => {
   };
 });
 
-import { oscillationsAndChaosPreferences as preferences } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 import { SingleSpringModel } from "../../../src/single-spring/model/SingleSpringModel.js";
 import { SingleSpringScreenView } from "../../../src/single-spring/view/SingleSpringScreenView.js";
 import { forceGC } from "../../helpers/memoryLeak.js";
+
+const preferences = new OscillationsAndChaosPreferencesModel();
 
 const screens = [
   [SingleSpringModel, SingleSpringScreenView],
@@ -41,7 +43,7 @@ const screens = [
 for (const [Model, View] of screens) {
   it(`${View.name} is collected while its model remains alive`, async () => {
     vi.stubGlobal("katex", { render: vi.fn() });
-    const model = new Model();
+    const model = new Model(preferences);
     try {
       const ref = (() => {
         const view = new View(model as never);
@@ -66,7 +68,7 @@ it("releases models after disposing their complete screens", async () => {
   vi.stubGlobal("katex", { render: vi.fn() });
   try {
     const refs = screens.flatMap(([Model, View]) => {
-      const model = new Model();
+      const model = new Model(preferences);
       const view = new View(model as never);
       const weakRefs = [new WeakRef<object>(model), new WeakRef<object>(view)];
       view.dispose();

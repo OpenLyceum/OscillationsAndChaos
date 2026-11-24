@@ -14,7 +14,7 @@ import { GridIcon } from "scenerystack/scenery-phet";
 import { Checkbox, Panel, type PanelOptions } from "scenerystack/sun";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 
 /**
@@ -52,7 +52,7 @@ type SelfOptions = {
 export type ToolsControlPanelOptions = SelfOptions & PanelOptions;
 
 export class ToolsControlPanel extends Panel {
-  public constructor(providedOptions: ToolsControlPanelOptions) {
+  public constructor(preferences: OscillationsAndChaosPreferencesModel, providedOptions: ToolsControlPanelOptions) {
     const { grid, distance, stopwatch, protractor, graph, ...panelProvidedOptions } = providedOptions;
 
     const panelOptions = optionize<PanelOptions, EmptySelfOptions, PanelOptions>()(
@@ -163,34 +163,34 @@ export class ToolsControlPanel extends Panel {
 
     // Add accessibility announcements for tool visibility changes
     grid.showProperty.lazyLink((showGrid) => {
-      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (preferences.announceStateChangesProperty.value) {
         const announcement = showGrid ? grid.a11yStrings.shown.value : grid.a11yStrings.hidden.value;
-        SimulationAnnouncer.announceSimulationState(announcement);
+        SimulationAnnouncer.announceSimulationState(preferences, announcement);
       }
     });
 
     distance.showProperty.lazyLink((showDistanceTool) => {
-      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (preferences.announceStateChangesProperty.value) {
         const announcement = showDistanceTool ? distance.a11yStrings.shown.value : distance.a11yStrings.hidden.value;
-        SimulationAnnouncer.announceSimulationState(announcement);
+        SimulationAnnouncer.announceSimulationState(preferences, announcement);
       }
     });
 
     stopwatch.showProperty.lazyLink((showStopwatch) => {
-      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (preferences.announceStateChangesProperty.value) {
         const announcement = showStopwatch ? stopwatch.a11yStrings.shown.value : stopwatch.a11yStrings.hidden.value;
-        SimulationAnnouncer.announceSimulationState(announcement);
+        SimulationAnnouncer.announceSimulationState(preferences, announcement);
       }
     });
 
     // Add protractor announcements if provided (for pendulum screens)
     if (protractor) {
       protractor.showProperty.lazyLink((showProtractor) => {
-        if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+        if (preferences.announceStateChangesProperty.value) {
           const announcement = showProtractor
             ? protractor.a11yStrings.shown.value
             : protractor.a11yStrings.hidden.value;
-          SimulationAnnouncer.announceSimulationState(announcement);
+          SimulationAnnouncer.announceSimulationState(preferences, announcement);
         }
       });
     }
@@ -198,9 +198,9 @@ export class ToolsControlPanel extends Panel {
     // Add graph announcements if provided (for configurable graph)
     if (graph) {
       graph.showProperty.lazyLink((showGraph) => {
-        if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+        if (preferences.announceStateChangesProperty.value) {
           const announcement = showGraph ? graph.a11yStrings.shown.value : graph.a11yStrings.hidden.value;
-          SimulationAnnouncer.announceSimulationState(announcement);
+          SimulationAnnouncer.announceSimulationState(preferences, announcement);
         }
       });
     }

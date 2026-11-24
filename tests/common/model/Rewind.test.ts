@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 import { DoublePendulumModel } from "../../../src/double-pendulum/model/DoublePendulumModel.js";
 import { DoubleSpringModel } from "../../../src/double-spring/model/DoubleSpringModel.js";
 import { PendulumModel } from "../../../src/pendulum/model/PendulumModel.js";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 import { SingleSpringModel } from "../../../src/single-spring/model/SingleSpringModel.js";
 
 for (const Model of [SingleSpringModel, DoubleSpringModel, PendulumModel, DoublePendulumModel]) {
@@ -12,7 +13,7 @@ for (const Model of [SingleSpringModel, DoubleSpringModel, PendulumModel, Double
     };
 
     it("restores exact recorded state and parameters after edits", () => {
-      const model = new Model();
+      const model = new Model(new OscillationsAndChaosPreferencesModel());
       try {
         model.isPlayingProperty.value = false;
         const initial = snapshot(model);
@@ -38,7 +39,7 @@ for (const Model of [SingleSpringModel, DoubleSpringModel, PendulumModel, Double
     });
 
     it("starts a new history after reset or preset restart", () => {
-      const model = new Model();
+      const model = new Model(new OscillationsAndChaosPreferencesModel());
       try {
         model.step(0.016, true);
         model.reset();
@@ -58,7 +59,7 @@ for (const Model of [SingleSpringModel, DoubleSpringModel, PendulumModel, Double
     });
 
     it("rewinds variable frames and branches from the restored state", () => {
-      const model = new Model();
+      const model = new Model(new OscillationsAndChaosPreferencesModel());
       try {
         model.step(0.01, true);
         const first = snapshot(model);

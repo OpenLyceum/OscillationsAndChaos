@@ -21,6 +21,7 @@ import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 
 export class SingleSpringModel extends BaseModel {
   // State variables
@@ -45,8 +46,8 @@ export class SingleSpringModel extends BaseModel {
   public readonly gravitationalPotentialEnergyProperty: ReadOnlyProperty<number>;
   public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
-  public constructor() {
-    super();
+  public constructor(preferences: OscillationsAndChaosPreferencesModel) {
+    super(preferences);
 
     // Initialize state to match first preset ("Heavy and Slow")
     // Position matches first preset initial displacement

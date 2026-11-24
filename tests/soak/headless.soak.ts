@@ -28,7 +28,7 @@ import { DoubleSpringScreen } from "../../src/double-spring/DoubleSpringScreen.j
 import { StringManager } from "../../src/i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../src/OscillationsAndChaosColors.js";
 import { PendulumScreen } from "../../src/pendulum/PendulumScreen.js";
-import { oscillationsAndChaosPreferences } from "../../src/preferences/OscillationsAndChaosPreferencesModel.js";
+import { OscillationsAndChaosPreferencesModel } from "../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 import { SingleSpringScreen } from "../../src/single-spring/SingleSpringScreen.js";
 import { describeHeadlessSoak } from "../helpers/headlessSoak.js";
 
@@ -38,6 +38,7 @@ function buildSim() {
   vi.stubGlobal("katex", { render: () => undefined });
 
   const stringManager = StringManager.getInstance();
+  const preferences = new OscillationsAndChaosPreferencesModel(Tandem.PREFERENCES);
   const screenNames = stringManager.getScreenNames();
 
   // Strings for the preference-change announcements below; the preference UI itself lives in
@@ -48,8 +49,8 @@ function buildSim() {
   // Add accessibility announcements for preference changes
   const a11yStrings = stringManager.getA11yStrings();
 
-  oscillationsAndChaosPreferences.solverTypeProperty.lazyLink((solverType) => {
-    if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+  preferences.solverTypeProperty.lazyLink((solverType) => {
+    if (preferences.announceStateChangesProperty.value) {
       let solverName = "";
       switch (solverType) {
         case SolverType.RK4:
@@ -67,24 +68,25 @@ function buildSim() {
       }
       const template = a11yStrings.solverChangedStringProperty.value;
       const announcement = template.replace("{{solver}}", solverName);
-      SimulationAnnouncer.announceSimulationState(announcement);
+      SimulationAnnouncer.announceSimulationState(preferences, announcement);
     }
   });
 
-  oscillationsAndChaosPreferences.springVisualizationTypeProperty.lazyLink((springType) => {
-    if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+  preferences.springVisualizationTypeProperty.lazyLink((springType) => {
+    if (preferences.announceStateChangesProperty.value) {
       const springTypeName =
         springType === SpringVisualizationType.CLASSIC
           ? springTypeNames.classicStringProperty.value
           : springTypeNames.parametricStringProperty.value;
       const template = a11yStrings.springVisualizationChangedStringProperty.value;
       const announcement = template.replace("{{type}}", springTypeName);
-      SimulationAnnouncer.announceSimulationState(announcement);
+      SimulationAnnouncer.announceSimulationState(preferences, announcement);
     }
   });
 
   const screens = [
     new SingleSpringScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.singleSpringStringProperty,
       tandem: Tandem.ROOT.createTandem("singleSpringScreen"),
@@ -93,6 +95,7 @@ function buildSim() {
       navigationBarIcon: createSingleSpringIcon(),
     }),
     new DoubleSpringScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.doubleSpringStringProperty,
       tandem: Tandem.ROOT.createTandem("doubleSpringScreen"),
@@ -101,6 +104,7 @@ function buildSim() {
       navigationBarIcon: createDoubleSpringIcon(),
     }),
     new PendulumScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.pendulumStringProperty,
       tandem: Tandem.ROOT.createTandem("pendulumScreen"),
@@ -109,6 +113,7 @@ function buildSim() {
       navigationBarIcon: createPendulumIcon(),
     }),
     new DoublePendulumScreen({
+      preferences,
       // The screen name Property updates automatically when the locale changes
       name: screenNames.doublePendulumStringProperty,
       tandem: Tandem.ROOT.createTandem("doublePendulumScreen"),

@@ -16,7 +16,7 @@ import { assert } from "scenerystack";
 import { BooleanProperty, EnumerationProperty, NumberProperty } from "scenerystack/axon";
 import { TimeSpeed } from "scenerystack/scenery-phet";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import { AdaptiveRK45Solver } from "./AdaptiveRK45Solver.js";
 import { DormandPrince87Solver } from "./DormandPrince87Solver.js";
 import { ForestRuthPEFRLSolver } from "./ForestRuthPEFRLSolver.js";
@@ -53,7 +53,10 @@ export abstract class BaseModel {
   };
   private readonly dampedSolver = new RungeKuttaSolver();
 
-  protected constructor(supportsPEFRL: boolean = true) {
+  public readonly preferences: OscillationsAndChaosPreferencesModel;
+
+  protected constructor(preferences: OscillationsAndChaosPreferencesModel, supportsPEFRL: boolean = true) {
+    this.preferences = preferences;
     this.supportsPEFRL = supportsPEFRL;
     // Initialize time control properties
     this.timeProperty = new NumberProperty(0.0);
@@ -63,13 +66,13 @@ export abstract class BaseModel {
     this.timeSpeedProperty = new EnumerationProperty(TimeSpeed.NORMAL);
 
     // Create initial physics solver based on preference
-    this.solver = this.createSolver(oscillationsAndChaosPreferences.solverTypeProperty.value);
+    this.solver = this.createSolver(this.preferences.solverTypeProperty.value);
 
     // Listen for solver type changes and recreate solver
-    oscillationsAndChaosPreferences.solverTypeProperty.link(this.solverTypeListener);
+    this.preferences.solverTypeProperty.link(this.solverTypeListener);
 
     // Listen for nominal time step changes and update the solver
-    oscillationsAndChaosPreferences.nominalTimeStepProperty.link(this.nominalTimeStepListener);
+    this.preferences.nominalTimeStepProperty.link(this.nominalTimeStepListener);
   }
 
   /**
@@ -93,7 +96,7 @@ export abstract class BaseModel {
     }
 
     // Apply the current nominal time step preference
-    solver.setFixedTimeStep(oscillationsAndChaosPreferences.nominalTimeStepProperty.value.value);
+    solver.setFixedTimeStep(this.preferences.nominalTimeStepProperty.value.value);
 
     return solver;
   }
@@ -254,8 +257,8 @@ export abstract class BaseModel {
   public abstract reset(): void;
 
   public dispose(): void {
-    oscillationsAndChaosPreferences.solverTypeProperty.unlink(this.solverTypeListener);
-    oscillationsAndChaosPreferences.nominalTimeStepProperty.unlink(this.nominalTimeStepListener);
+    this.preferences.solverTypeProperty.unlink(this.solverTypeListener);
+    this.preferences.nominalTimeStepProperty.unlink(this.nominalTimeStepListener);
     this.history.length = 0;
     this.canStepBackwardProperty.dispose();
     this.timeProperty.dispose();

@@ -1,7 +1,9 @@
 import { afterEach, describe, expect, it } from "vitest";
 import { SolverType } from "../../../src/common/model/SolverType.js";
 import { DoublePendulumModel } from "../../../src/double-pendulum/model/DoublePendulumModel.js";
-import { oscillationsAndChaosPreferences } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
+
+const oscillationsAndChaosPreferences = new OscillationsAndChaosPreferencesModel();
 
 /**
  * Independent solution of the coupled system in doc/model.md, with b₁ = b₂ = b.
@@ -47,7 +49,7 @@ describe("DoublePendulumModel", () => {
   });
 
   it("uses the documented potential energy, without counting the lower mass twice", () => {
-    model = new DoublePendulumModel();
+    model = new DoublePendulumModel(oscillationsAndChaosPreferences);
     model.angle1Property.value = 0;
     model.angle2Property.value = 0;
     model.mass1Property.value = 1;
@@ -61,7 +63,7 @@ describe("DoublePendulumModel", () => {
   });
 
   it("matches the documented accelerations when damping is on", () => {
-    model = new DoublePendulumModel();
+    model = new DoublePendulumModel(oscillationsAndChaosPreferences);
     model.angle1Property.value = 0.2;
     model.angle2Property.value = 1.1;
     model.angularVelocity1Property.value = 0.5;
@@ -83,7 +85,7 @@ describe("DoublePendulumModel", () => {
   });
 
   it("steps the upper bob back toward vertical from a displaced rest state", () => {
-    model = new DoublePendulumModel();
+    model = new DoublePendulumModel(oscillationsAndChaosPreferences);
     model.isPlayingProperty.value = false;
     model.dampingProperty.value = 0;
     model.angle1Property.value = 0.4;
@@ -100,7 +102,7 @@ describe("DoublePendulumModel", () => {
 
   it("uses RK4 for nonseparable dynamics when PEFRL is selected or hot-swapped", () => {
     oscillationsAndChaosPreferences.solverTypeProperty.value = SolverType.FOREST_RUTH_PEFRL;
-    model = new DoublePendulumModel();
+    model = new DoublePendulumModel(oscillationsAndChaosPreferences);
     model.step(0.08, true);
     const pefrlSelectedState = [
       model.angle1Property.value,

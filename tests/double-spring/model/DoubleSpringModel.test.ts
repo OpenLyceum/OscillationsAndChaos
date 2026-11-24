@@ -1,8 +1,9 @@
 import { expect, it } from "vitest";
 import { DoubleSpringModel } from "../../../src/double-spring/model/DoubleSpringModel.js";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 
 it("preserves coupled spring energy when both masses pass the former position limit", () => {
-  const model = new DoubleSpringModel();
+  const model = new DoubleSpringModel(new OscillationsAndChaosPreferencesModel());
   model.position1Property.value = 5;
   model.position2Property.value = 5;
   model.velocity1Property.value = 20;

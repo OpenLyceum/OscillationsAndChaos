@@ -46,7 +46,7 @@ import { ComboBox, Panel } from "scenerystack/sun";
 import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import type { Preset } from "../model/Preset.js";
 import OscillationsAndChaosHotkeyData from "../OscillationsAndChaosHotkeyData.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
@@ -69,6 +69,7 @@ import { VectorControlPanel } from "./VectorControlPanel.js";
  * Interface that all models must implement to work with BaseScreenView
  */
 export type TimeControllableModel = {
+  readonly preferences: OscillationsAndChaosPreferencesModel;
   isPlayingProperty: BooleanProperty;
   timeSpeedProperty: EnumerationProperty<TimeSpeed>;
   timeProperty: TProperty<number>;
@@ -572,7 +573,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
           const announcement = this.model.isPlayingProperty.value
             ? a11yStrings.simulationPlayingStringProperty.value
             : a11yStrings.simulationPausedStringProperty.value;
-          SimulationAnnouncer.announceSimulationState(announcement);
+          SimulationAnnouncer.announceSimulationState(this.model.preferences, announcement);
         } else if (
           keysPressed === "arrowLeft" &&
           !this.model.isPlayingProperty.value &&
@@ -581,12 +582,18 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
           // Step backward with Left Arrow (only when paused)
           this.model.step(-manualStepSize, true);
           this.step(-manualStepSize);
-          SimulationAnnouncer.announceSimulationState(a11yStrings.steppedBackwardStringProperty.value);
+          SimulationAnnouncer.announceSimulationState(
+            this.model.preferences,
+            a11yStrings.steppedBackwardStringProperty.value,
+          );
         } else if (keysPressed === "arrowRight" && !this.model.isPlayingProperty.value) {
           // Step forward with Right Arrow (only when paused)
           this.model.step(manualStepSize, true);
           this.step(manualStepSize);
-          SimulationAnnouncer.announceSimulationState(a11yStrings.steppedForwardStringProperty.value);
+          SimulationAnnouncer.announceSimulationState(
+            this.model.preferences,
+            a11yStrings.steppedForwardStringProperty.value,
+          );
         }
       },
     });
@@ -601,16 +608,13 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     const handleVisibilityChange = () => {
       if (document.hidden) {
         // Tab became hidden
-        if (
-          oscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty.value &&
-          this.model.isPlayingProperty.value
-        ) {
+        if (this.model.preferences.autoPauseWhenTabHiddenProperty.value && this.model.isPlayingProperty.value) {
           // Store that we were playing before hiding
           this.wasPlayingBeforeHidden = true;
           // Pause the simulation
           this.model.isPlayingProperty.value = false;
         }
-      } else if (oscillationsAndChaosPreferences.autoPauseWhenTabHiddenProperty.value && this.wasPlayingBeforeHidden) {
+      } else if (this.model.preferences.autoPauseWhenTabHiddenProperty.value && this.wasPlayingBeforeHidden) {
         // Tab became visible — restore playing state
         this.model.isPlayingProperty.value = true;
         this.wasPlayingBeforeHidden = false;
@@ -699,14 +703,14 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       const announcement = isPlaying
         ? a11yStrings.simulationStartedStringProperty.value
         : a11yStrings.simulationPausedStringProperty.value;
-      SimulationAnnouncer.announceSimulationState(announcement);
+      SimulationAnnouncer.announceSimulationState(this.model.preferences, announcement);
     });
 
     // Announce when speed changes
     this.lazyLinkProperty(this.model.timeSpeedProperty, (speed) => {
       const template = a11yStrings.speedChangedStringProperty.value;
       const announcement = template.replace("{{speed}}", speed.name);
-      SimulationAnnouncer.announceSimulationState(announcement);
+      SimulationAnnouncer.announceSimulationState(this.model.preferences, announcement);
     });
   }
 
@@ -867,7 +871,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     const a11yStrings = this.getA11yStrings();
 
     // Create vector control panel
-    this.vectorPanel = new VectorControlPanel({
+    this.vectorPanel = new VectorControlPanel(this.model.preferences, {
       velocity: {
         showProperty: this.showVelocityProperty,
         labelProperty: visualizationLabels.velocityStringProperty,
@@ -945,7 +949,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       };
     }
 
-    this.toolsPanel = new ToolsControlPanel(toolsConfig);
+    this.toolsPanel = new ToolsControlPanel(this.model.preferences, toolsConfig);
     this.toolsPanel.left = this.layoutBounds.minX + 10;
     this.toolsPanel.bottom = this.layoutBounds.maxY - 10;
     this.addChild(this.toolsPanel);

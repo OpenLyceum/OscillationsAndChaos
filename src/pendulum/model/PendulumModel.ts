@@ -23,6 +23,7 @@ import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 
 export class PendulumModel extends BaseModel {
   // State variables
@@ -44,8 +45,8 @@ export class PendulumModel extends BaseModel {
   public readonly potentialEnergyProperty: ReadOnlyProperty<number>;
   public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
-  public constructor() {
-    super();
+  public constructor(preferences: OscillationsAndChaosPreferencesModel) {
+    super(preferences);
 
     // Initialize state (start at 45 degrees). No Range: angles are cyclic and the
     // integrator / keyboard drag can pass ±π; a finite range would halt looping motion.

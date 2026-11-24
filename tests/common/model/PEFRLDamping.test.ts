@@ -5,8 +5,10 @@ import { RungeKuttaSolver } from "../../../src/common/model/RungeKuttaSolver.js"
 import { SolverType } from "../../../src/common/model/SolverType.js";
 import { DoubleSpringModel } from "../../../src/double-spring/model/DoubleSpringModel.js";
 import { PendulumModel } from "../../../src/pendulum/model/PendulumModel.js";
-import { oscillationsAndChaosPreferences as preferences } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 import { SingleSpringModel } from "../../../src/single-spring/model/SingleSpringModel.js";
+
+const preferences = new OscillationsAndChaosPreferencesModel();
 
 const models: (SingleSpringModel | DoubleSpringModel | PendulumModel)[] = [];
 const initialSolver = preferences.solverTypeProperty.value;
@@ -23,7 +25,7 @@ afterEach(() => {
 for (const Model of [SingleSpringModel, DoubleSpringModel, PendulumModel]) {
   it(`${Model.name} switches between RK4 and PEFRL as damping changes`, () => {
     preferences.solverTypeProperty.value = SolverType.FOREST_RUTH_PEFRL;
-    const model = new Model();
+    const model = new Model(preferences);
     models.push(model);
     const damping =
       model instanceof DoubleSpringModel ? [model.damping1Property, model.damping2Property] : [model.dampingProperty];
@@ -54,7 +56,7 @@ for (const Model of [SingleSpringModel, DoubleSpringModel, PendulumModel]) {
 
 it("uses the nominal timestep for RK4 fallback and accurately integrates strong damping", () => {
   preferences.solverTypeProperty.value = SolverType.FOREST_RUTH_PEFRL;
-  const model = new PendulumModel();
+  const model = new PendulumModel(preferences);
   models.push(model);
   preferences.nominalTimeStepProperty.value = NominalTimeStep.MEDIUM;
   model.gravityProperty.value = 0;

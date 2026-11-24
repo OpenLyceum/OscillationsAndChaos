@@ -15,7 +15,7 @@ import { ArrowNode, PhetColorScheme } from "scenerystack/scenery-phet";
 import { Checkbox, Panel, type PanelOptions } from "scenerystack/sun";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import SimulationAnnouncer from "../util/SimulationAnnouncer.js";
 
 /**
@@ -49,7 +49,7 @@ type SelfOptions = {
 export type VectorControlPanelOptions = SelfOptions & PanelOptions;
 
 export class VectorControlPanel extends Panel {
-  public constructor(providedOptions: VectorControlPanelOptions) {
+  public constructor(preferences: OscillationsAndChaosPreferencesModel, providedOptions: VectorControlPanelOptions) {
     const options = optionize<VectorControlPanelOptions, SelfOptions, PanelOptions>()(
       {
         xMargin: 10,
@@ -148,25 +148,25 @@ export class VectorControlPanel extends Panel {
 
     // Add accessibility announcements for vector visibility changes
     velocity.showProperty.lazyLink((showVelocity) => {
-      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (preferences.announceStateChangesProperty.value) {
         const announcement = showVelocity ? velocity.a11yStrings.shown.value : velocity.a11yStrings.hidden.value;
-        SimulationAnnouncer.announceSimulationState(announcement);
+        SimulationAnnouncer.announceSimulationState(preferences, announcement);
       }
     });
 
     force.showProperty.lazyLink((showForce) => {
-      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (preferences.announceStateChangesProperty.value) {
         const announcement = showForce ? force.a11yStrings.shown.value : force.a11yStrings.hidden.value;
-        SimulationAnnouncer.announceSimulationState(announcement);
+        SimulationAnnouncer.announceSimulationState(preferences, announcement);
       }
     });
 
     acceleration.showProperty.lazyLink((showAcceleration) => {
-      if (oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+      if (preferences.announceStateChangesProperty.value) {
         const announcement = showAcceleration
           ? acceleration.a11yStrings.shown.value
           : acceleration.a11yStrings.hidden.value;
-        SimulationAnnouncer.announceSimulationState(announcement);
+        SimulationAnnouncer.announceSimulationState(preferences, announcement);
       }
     });
   }

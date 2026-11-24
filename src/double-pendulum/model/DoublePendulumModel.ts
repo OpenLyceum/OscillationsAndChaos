@@ -19,6 +19,7 @@ import { Range } from "scenerystack/dot";
 import { BaseModel } from "../../common/model/BaseModel.js";
 import { StatePropertyMapper } from "../../common/model/StatePropertyMapper.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 
 /**
  * Angular accelerations for the coupled system in `doc/model.md`.
@@ -85,10 +86,10 @@ export class DoublePendulumModel extends BaseModel {
   public readonly potentialEnergyProperty: ReadOnlyProperty<number>;
   public readonly totalEnergyProperty: ReadOnlyProperty<number>;
 
-  public constructor() {
+  public constructor(preferences: OscillationsAndChaosPreferencesModel) {
     // Coupled angular accelerations depend on velocity even without damping,
     // so the separable PEFRL integrator cannot be used for this system.
-    super(false);
+    super(preferences, false);
 
     // Initialize state (both start at 90 degrees). No Range: chaotic looping must
     // be allowed to pass ±π; a finite range would clamp and freeze the motion.

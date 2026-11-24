@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it } from "vitest";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 import { SingleSpringModel } from "../../../src/single-spring/model/SingleSpringModel.js";
 
 describe("SingleSpringModel", () => {
@@ -9,7 +10,7 @@ describe("SingleSpringModel", () => {
   });
 
   it("constructs with default preset state", () => {
-    model = new SingleSpringModel();
+    model = new SingleSpringModel(new OscillationsAndChaosPreferencesModel());
 
     expect(model.positionProperty.value).toBeCloseTo(1, 6);
     expect(model.velocityProperty.value).toBeCloseTo(0, 6);
@@ -17,7 +18,7 @@ describe("SingleSpringModel", () => {
   });
 
   it("advances time on a forced step while paused", () => {
-    model = new SingleSpringModel();
+    model = new SingleSpringModel(new OscillationsAndChaosPreferencesModel());
     model.isPlayingProperty.value = false;
 
     model.step(0.05, true);
@@ -26,7 +27,7 @@ describe("SingleSpringModel", () => {
   });
 
   it("reset restores initial state and time", () => {
-    model = new SingleSpringModel();
+    model = new SingleSpringModel(new OscillationsAndChaosPreferencesModel());
     model.velocityProperty.value = 2;
     model.positionProperty.value = -2;
     model.step(0.1, true);
@@ -39,7 +40,7 @@ describe("SingleSpringModel", () => {
   });
 
   it("displaced mass gains nonzero velocity when stepped", () => {
-    model = new SingleSpringModel();
+    model = new SingleSpringModel(new OscillationsAndChaosPreferencesModel());
     model.isPlayingProperty.value = false;
     model.positionProperty.value = 2;
     model.velocityProperty.value = 0;
@@ -50,7 +51,7 @@ describe("SingleSpringModel", () => {
   });
 
   it("preserves undamped motion beyond the former position limit", () => {
-    model = new SingleSpringModel();
+    model = new SingleSpringModel(new OscillationsAndChaosPreferencesModel());
     model.dampingProperty.value = 0;
     const initialEnergy = model.totalEnergyProperty.value;
     for (let i = 0; i < 90; i++) {

@@ -18,7 +18,7 @@ import { SpringVisualizationType } from "../common/SpringVisualizationType.js";
 import OscillationsAndChaosNamespace from "../OscillationsAndChaosNamespace.js";
 import oscillationsAndChaosQueryParameters from "./oscillationsAndChaosQueryParameters.js";
 
-class OscillationsAndChaosPreferencesModel {
+export class OscillationsAndChaosPreferencesModel {
   /**
    * Whether to automatically pause the simulation when the browser tab is hidden.
    * When enabled, the simulation will pause when switching tabs or minimizing the browser,
@@ -75,7 +75,7 @@ class OscillationsAndChaosPreferencesModel {
    */
   public readonly announceDragInteractionsProperty: BooleanProperty;
 
-  public constructor(tandem: Tandem = Tandem.PREFERENCES) {
+  public constructor(tandem: Tandem = Tandem.OPT_OUT) {
     const simulationTandem = tandem.createTandem("simulationPreferences");
     const visualTandem = tandem.createTandem("visualPreferences");
     const audioTandem = tandem.createTandem("audioPreferences");
@@ -173,8 +173,5 @@ class OscillationsAndChaosPreferencesModel {
     this.announceDragInteractionsProperty.reset();
   }
 }
-
-/** Shared instance read by every screen and the Preferences dialog. */
-export const oscillationsAndChaosPreferences = new OscillationsAndChaosPreferencesModel();
 
 OscillationsAndChaosNamespace.register("OscillationsAndChaosPreferencesModel", OscillationsAndChaosPreferencesModel);

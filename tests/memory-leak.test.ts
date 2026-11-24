@@ -14,6 +14,7 @@ import { DoubleSpringModel } from "../src/double-spring/model/DoubleSpringModel.
 import { StringManager } from "../src/i18n/StringManager.js";
 import OscillationsAndChaosColors from "../src/OscillationsAndChaosColors.js";
 import { PendulumModel } from "../src/pendulum/model/PendulumModel.js";
+import { OscillationsAndChaosPreferencesModel } from "../src/preferences/OscillationsAndChaosPreferencesModel.js";
 import { SingleSpringModel } from "../src/single-spring/model/SingleSpringModel.js";
 import { describeDisposalLeaks, expectNoListenerGrowth, forceGC } from "./helpers/memoryLeak.js";
 
@@ -45,10 +46,13 @@ describe("Memory leak regression", () => {
   });
 });
 
+// The preferences outlive each model, so a lingering preference listener would retain it.
+const preferences = new OscillationsAndChaosPreferencesModel();
+
 describeDisposalLeaks(
   [SingleSpringModel, DoubleSpringModel, PendulumModel, DoublePendulumModel].map((Model) => ({
     name: Model.name,
-    create: () => new Model(),
+    create: () => new Model(preferences),
   })),
 );
 

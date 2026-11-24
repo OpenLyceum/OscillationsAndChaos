@@ -7,6 +7,7 @@ import { DoubleSpringModel } from "../../../src/double-spring/model/DoubleSpring
 import { DoubleSpringScreenView } from "../../../src/double-spring/view/DoubleSpringScreenView.js";
 import { PendulumModel } from "../../../src/pendulum/model/PendulumModel.js";
 import { PendulumScreenView } from "../../../src/pendulum/view/PendulumScreenView.js";
+import { OscillationsAndChaosPreferencesModel } from "../../../src/preferences/OscillationsAndChaosPreferencesModel.js";
 import { SingleSpringModel } from "../../../src/single-spring/model/SingleSpringModel.js";
 import { SingleSpringScreenView } from "../../../src/single-spring/view/SingleSpringScreenView.js";
 
@@ -22,7 +23,7 @@ afterEach(() => {
 });
 
 function fixture() {
-  const model = new SingleSpringModel();
+  const model = new SingleSpringModel(new OscillationsAndChaosPreferencesModel());
   models.push(model);
   const stopwatch = new Stopwatch();
   stopwatches.push(stopwatch);
@@ -94,7 +95,7 @@ for (const [Model, View] of [
   [DoublePendulumModel, DoublePendulumScreenView],
 ] as const) {
   it(`${View.name} advances physics only through the framework's model step`, () => {
-    const model = new Model();
+    const model = new Model(new OscillationsAndChaosPreferencesModel());
     const view = {
       model,
       lastModelTime: 0,

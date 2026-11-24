@@ -242,7 +242,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
           translateNode: false,
           start: () => {
             this.isDraggingProperty.value = true;
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingUpperBobStringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingUpperBobStringProperty.value,
+            );
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
@@ -256,7 +259,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
             this.isDraggingProperty.value = false;
             const angleDegrees = StringUtils.toFixedNumberLTR((this.model.angle1Property.value * 180) / Math.PI, 1);
             const template = this.a11yStrings.upperBobReleasedAtStringProperty.value;
-            SimulationAnnouncer.announceDragInteraction(template.replace("{{angle}}", angleDegrees));
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              template.replace("{{angle}}", angleDegrees),
+            );
           },
         },
         keyboardDragListenerOptions: {
@@ -265,7 +271,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
           shiftDragDelta: 0.01,
           start: () => {
             this.isDraggingProperty.value = true;
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingUpperBobStringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingUpperBobStringProperty.value,
+            );
           },
           drag: (_event, listener) => {
             this.model.angle1Property.value += listener.modelDelta.x;
@@ -276,7 +285,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
             this.isDraggingProperty.value = false;
             const angleDegrees = StringUtils.toFixedNumberLTR((this.model.angle1Property.value * 180) / Math.PI, 1);
             const template = this.a11yStrings.upperBobReleasedAtStringProperty.value;
-            SimulationAnnouncer.announceDragInteraction(template.replace("{{angle}}", angleDegrees));
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              template.replace("{{angle}}", angleDegrees),
+            );
           },
         },
       }),
@@ -289,7 +301,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
           translateNode: false,
           start: () => {
             this.isDraggingProperty.value = true;
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingLowerBobStringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingLowerBobStringProperty.value,
+            );
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
@@ -307,7 +322,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
             this.isDraggingProperty.value = false;
             const angleDegrees = StringUtils.toFixedNumberLTR((this.model.angle2Property.value * 180) / Math.PI, 1);
             const template = this.a11yStrings.lowerBobReleasedAtStringProperty.value;
-            SimulationAnnouncer.announceDragInteraction(template.replace("{{angle}}", angleDegrees));
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              template.replace("{{angle}}", angleDegrees),
+            );
           },
         },
         keyboardDragListenerOptions: {
@@ -316,7 +334,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
           shiftDragDelta: 0.01,
           start: () => {
             this.isDraggingProperty.value = true;
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingLowerBobStringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingLowerBobStringProperty.value,
+            );
           },
           drag: (_event, listener) => {
             this.model.angle2Property.value += listener.modelDelta.x;
@@ -327,7 +348,10 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
             this.isDraggingProperty.value = false;
             const angleDegrees = StringUtils.toFixedNumberLTR((this.model.angle2Property.value * 180) / Math.PI, 1);
             const template = this.a11yStrings.lowerBobReleasedAtStringProperty.value;
-            SimulationAnnouncer.announceDragInteraction(template.replace("{{angle}}", angleDegrees));
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              template.replace("{{angle}}", angleDegrees),
+            );
           },
         },
       }),
@@ -412,6 +436,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     // Add accessibility announcements for parameter changes
     const announce = (template: string, value: number, decimalPlaces: number) => {
       SimulationAnnouncer.announceParameterChange(
+        this.model.preferences,
         StringUtils.fillIn(template, { value: StringUtils.toFixedNumberLTR(value, decimalPlaces) }),
       );
     };
@@ -978,7 +1003,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     // Announce preset change
     const template = this.a11yStrings.presetAppliedStringProperty.value;
     const announcement = template.replace("{{preset}}", preset.nameProperty.value);
-    SimulationAnnouncer.announceDragInteraction(announcement);
+    SimulationAnnouncer.announceDragInteraction(this.model.preferences, announcement);
 
     this.isApplyingPreset = false;
   }

@@ -39,7 +39,6 @@ import { VectorNodeFactory } from "../../common/view/VectorNodeFactory.js";
 import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosColors from "../../OscillationsAndChaosColors.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import type { DoubleSpringModel } from "../model/DoubleSpringModel.js";
 import { DoubleSpringPresets } from "../model/DoubleSpringPresets.js";
 import { DoubleSpringScreenSummaryContent } from "./DoubleSpringScreenSummaryContent.js";
@@ -159,7 +158,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
 
     // Set initial spring nodes based on preference
     const useParametric =
-      oscillationsAndChaosPreferences.springVisualizationTypeProperty.value === SpringVisualizationType.PARAMETRIC;
+      this.model.preferences.springVisualizationTypeProperty.value === SpringVisualizationType.PARAMETRIC;
 
     this.currentSpring1Node = useParametric ? this.parametricSpring1Node : this.classicSpring1Node;
     this.currentSpring2Node = useParametric ? this.parametricSpring2Node : this.classicSpring2Node;
@@ -243,7 +242,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
 
     // Listen to spring visualization preference changes
     // Using lazyLink to avoid triggering during initialization
-    this.lazyLinkProperty(oscillationsAndChaosPreferences.springVisualizationTypeProperty, (springType) => {
+    this.lazyLinkProperty(this.model.preferences.springVisualizationTypeProperty, (springType) => {
       this.switchSpringVisualization(springType);
     });
 
@@ -253,7 +252,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
       const position = toFixed(this.model.position1Property.value, 2);
       const template = this.a11yStrings.mass1ReleasedAtStringProperty.value;
       const announcement = template.replace("{{position}}", position);
-      SimulationAnnouncer.announceDragInteraction(announcement);
+      SimulationAnnouncer.announceDragInteraction(this.model.preferences, announcement);
     };
     this.addDisposableInputListener(
       this.mass1Node,
@@ -265,7 +264,10 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
             const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
             dragOffsetModel1 = this.model.position1Property.value - pointerModelY;
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingMass1StringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingMass1StringProperty.value,
+            );
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
@@ -283,7 +285,10 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
           dragSpeed: 80,
           shiftDragSpeed: 30,
           start: () => {
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingMass1StringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingMass1StringProperty.value,
+            );
           },
           drag: (_event, listener) => {
             this.model.position1Property.value = constrainSpringDragPosition(
@@ -302,7 +307,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
       const position = toFixed(this.model.position2Property.value, 2);
       const template = this.a11yStrings.mass2ReleasedAtStringProperty.value;
       const announcement = template.replace("{{position}}", position);
-      SimulationAnnouncer.announceDragInteraction(announcement);
+      SimulationAnnouncer.announceDragInteraction(this.model.preferences, announcement);
     };
     this.addDisposableInputListener(
       this.mass2Node,
@@ -314,7 +319,10 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
             const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
             dragOffsetModel2 = this.model.position2Property.value - pointerModelY;
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingMass2StringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingMass2StringProperty.value,
+            );
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
@@ -332,7 +340,10 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
           dragSpeed: 80,
           shiftDragSpeed: 30,
           start: () => {
-            SimulationAnnouncer.announceDragInteraction(this.a11yStrings.draggingMass2StringProperty.value);
+            SimulationAnnouncer.announceDragInteraction(
+              this.model.preferences,
+              this.a11yStrings.draggingMass2StringProperty.value,
+            );
           },
           drag: (_event, listener) => {
             this.model.position2Property.value = constrainSpringDragPosition(
@@ -481,6 +492,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     // Add accessibility announcements for parameter changes
     const announce = (template: string, value: number, decimalPlaces: number) => {
       SimulationAnnouncer.announceParameterChange(
+        this.model.preferences,
         StringUtils.fillIn(template, { value: StringUtils.toFixedNumberLTR(value, decimalPlaces) }),
       );
     };
@@ -944,7 +956,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     // Announce preset change
     const template = this.a11yStrings.presetAppliedStringProperty.value;
     const announcement = template.replace("{{preset}}", preset.nameProperty.value);
-    SimulationAnnouncer.announceDragInteraction(announcement);
+    SimulationAnnouncer.announceDragInteraction(this.model.preferences, announcement);
 
     this.isApplyingPreset = false;
   }

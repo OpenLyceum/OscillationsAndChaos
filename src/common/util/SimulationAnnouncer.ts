@@ -10,7 +10,7 @@
 import { voicingUtteranceQueue } from "scenerystack/scenery";
 import { Utterance } from "scenerystack/utterance-queue";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
-import { oscillationsAndChaosPreferences } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
+import type { OscillationsAndChaosPreferencesModel } from "../../preferences/OscillationsAndChaosPreferencesModel.js";
 import { GRAPH_CHANGE_ANNOUNCEMENT_DELAY, PARAMETER_CHANGE_ANNOUNCEMENT_DELAY } from "./AccessibilityDelayConstants.js";
 
 /**
@@ -73,8 +73,8 @@ class SimulationAnnouncer {
   /**
    * Announce simulation state changes (play/pause/step)
    */
-  public announceSimulationState(message: string): void {
-    if (!oscillationsAndChaosPreferences.announceStateChangesProperty.value) {
+  public announceSimulationState(preferences: OscillationsAndChaosPreferencesModel, message: string): void {
+    if (!preferences.announceStateChangesProperty.value) {
       return;
     }
     this.simulationStateUtterance.alert = message;
@@ -84,8 +84,8 @@ class SimulationAnnouncer {
   /**
    * Announce parameter changes (mass, spring constant, damping, etc.)
    */
-  public announceParameterChange(message: string): void {
-    if (!oscillationsAndChaosPreferences.announceParameterChangesProperty.value) {
+  public announceParameterChange(preferences: OscillationsAndChaosPreferencesModel, message: string): void {
+    if (!preferences.announceParameterChangesProperty.value) {
       return;
     }
     this.parameterChangeUtterance.alert = message;
@@ -103,8 +103,8 @@ class SimulationAnnouncer {
   /**
    * Announce drag interactions (start, end, position changes)
    */
-  public announceDragInteraction(message: string): void {
-    if (!oscillationsAndChaosPreferences.announceDragInteractionsProperty.value) {
+  public announceDragInteraction(preferences: OscillationsAndChaosPreferencesModel, message: string): void {
+    if (!preferences.announceDragInteractionsProperty.value) {
       return;
     }
     this.dragInteractionUtterance.alert = message;
