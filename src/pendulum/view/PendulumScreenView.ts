@@ -42,7 +42,8 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
   private readonly pivotNode: Circle;
   private readonly pivotPoint: Vector2;
   protected override readonly presetProperty: Property<PresetOption>;
-  protected override readonly presets: Preset[];
+  protected override readonly presets: [Preset, ...Preset[]];
+  protected readonly modelViewTransform: ModelViewTransform2;
   protected override isApplyingPreset: boolean = false;
 
   // Vector visualization
@@ -72,7 +73,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     this.a11yStrings = this.stringManager.getA11yStrings();
 
     // Initialize with first preset as default
-    this.presetProperty = new Property<PresetOption>(this.presets[0]!);
+    this.presetProperty = new Property<PresetOption>(this.presets[0]);
 
     // Pivot point (top center of screen)
     this.pivotPoint = new Vector2(this.layoutBounds.centerX, this.layoutBounds.minY + 100);
@@ -278,7 +279,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     });
 
     // Apply the first preset immediately
-    this.applyPreset(this.presets[0]!);
+    this.applyPreset(this.presets[0]);
 
     // Create configurable graph with available properties
     const propertyNames = this.stringManager.getGraphPropertyNames();
@@ -321,18 +322,18 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     ];
 
     // Setup the configurable graph (angle vs time by default)
-    this.setupConfigurableGraph(availableProperties, 0);
-    this.addChild(this.configurableGraph!);
+    const graph = this.setupConfigurableGraph(availableProperties, 0);
+    this.addChild(graph);
 
     // Position control panel at the top right
     controlPanel.right = this.layoutBounds.maxX - 10;
     controlPanel.top = this.layoutBounds.minY + 10;
 
     // Setup vector and tools panels using base class method (includes protractor for pendulum)
-    this.setupVectorAndToolsPanels(true);
+    const vectorPanel = this.setupVectorAndToolsPanels(graph, true);
 
     // Position graph beneath vector panel
-    this.positionConfigurableGraph(this.vectorPanel!);
+    this.positionConfigurableGraph(vectorPanel);
 
     // pdom - Setup screen summary for Interactive Description
     this.setupScreenSummary();
@@ -475,7 +476,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     const modelBobPosition = new Vector2(modelBobX, modelBobY);
 
     // Convert to view coordinates
-    const viewBobPosition = this.modelViewTransform!.modelToViewPosition(modelBobPosition);
+    const viewBobPosition = this.modelViewTransform.modelToViewPosition(modelBobPosition);
 
     // Update bob position
     this.bobNode.center = viewBobPosition;
@@ -535,7 +536,7 @@ export class PendulumScreenView extends BaseScreenView<PendulumModel> {
     const modelBobX = L * Math.sin(angle);
     const modelBobY = L * Math.cos(angle);
     const modelBobPosition = new Vector2(modelBobX, modelBobY);
-    const viewBobPosition = this.modelViewTransform!.modelToViewPosition(modelBobPosition);
+    const viewBobPosition = this.modelViewTransform.modelToViewPosition(modelBobPosition);
 
     // Calculate tangential direction (perpendicular to rod)
     const tangentX = Math.cos(angle); // perpendicular to rod direction

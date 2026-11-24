@@ -58,7 +58,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
   private currentSpring2Node: SpringNode | ParametricSpringNode;
   private readonly fixedPoint: Vector2;
   protected override readonly presetProperty: Property<PresetOption>;
-  protected override readonly presets: Preset[];
+  protected override readonly presets: [Preset, ...Preset[]];
+  protected readonly modelViewTransform: ModelViewTransform2;
   protected override isApplyingPreset: boolean = false;
 
   // Vectors for mass 1
@@ -89,7 +90,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.presets = DoubleSpringPresets.getPresets();
 
     // Initialize with first preset as default
-    this.presetProperty = new Property<PresetOption>(this.presets[0]!);
+    this.presetProperty = new Property<PresetOption>(this.presets[0]);
 
     // Get accessibility strings for announcements
     this.stringManager = StringManager.getInstance();
@@ -257,12 +258,12 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.addDisposableInputListener(
       this.mass1Node,
       new RichDragListener({
-        transform: this.modelViewTransform!,
+        transform: this.modelViewTransform,
         dragListenerOptions: {
           translateNode: false,
           start: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
-            const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
+            const pointerModelY = this.modelViewTransform.viewToModelY(parentPoint.y);
             dragOffsetModel1 = this.model.position1Property.value - pointerModelY;
             SimulationAnnouncer.announceDragInteraction(
               this.model.preferences,
@@ -271,7 +272,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
-            const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
+            const pointerModelY = this.modelViewTransform.viewToModelY(parentPoint.y);
             this.model.position1Property.value = constrainSpringDragPosition(
               this.model.position1Property.value,
               pointerModelY + dragOffsetModel1,
@@ -312,12 +313,12 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     this.addDisposableInputListener(
       this.mass2Node,
       new RichDragListener({
-        transform: this.modelViewTransform!,
+        transform: this.modelViewTransform,
         dragListenerOptions: {
           translateNode: false,
           start: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
-            const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
+            const pointerModelY = this.modelViewTransform.viewToModelY(parentPoint.y);
             dragOffsetModel2 = this.model.position2Property.value - pointerModelY;
             SimulationAnnouncer.announceDragInteraction(
               this.model.preferences,
@@ -326,7 +327,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
-            const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
+            const pointerModelY = this.modelViewTransform.viewToModelY(parentPoint.y);
             this.model.position2Property.value = constrainSpringDragPosition(
               this.model.position2Property.value,
               pointerModelY + dragOffsetModel2,
@@ -452,14 +453,14 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     ];
 
     // Setup the configurable graph (position1 vs time by default)
-    this.setupConfigurableGraph(availableProperties, 0);
-    this.addChild(this.configurableGraph!);
+    const graph = this.setupConfigurableGraph(availableProperties, 0);
+    this.addChild(graph);
 
     // Setup vector and tools panels using base class method (no protractor for spring screens)
-    this.setupVectorAndToolsPanels(false);
+    const vectorPanel = this.setupVectorAndToolsPanels(graph, false);
 
     // Position graph beneath vector panel
-    this.positionConfigurableGraph(this.vectorPanel!);
+    this.positionConfigurableGraph(vectorPanel);
 
     // pdom - Setup screen summary for Interactive Description
     this.setupScreenSummary();
@@ -519,7 +520,7 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
     });
 
     // Apply the first preset immediately
-    this.applyPreset(this.presets[0]!);
+    this.applyPreset(this.presets[0]);
 
     // pdom - Note: setupScreenSummary and adding masses to playAreaNode
     // are done after graph positioning but before setupCommonControls
@@ -737,8 +738,8 @@ export class DoubleSpringScreenView extends BaseScreenView<DoubleSpringModel> {
 
     const mass1ModelPos = new Vector2(0, mass1TotalLength);
     const mass2ModelPos = new Vector2(0, mass2TotalLength);
-    const mass1ViewPos = this.modelViewTransform!.modelToViewPosition(mass1ModelPos);
-    const mass2ViewPos = this.modelViewTransform!.modelToViewPosition(mass2ModelPos);
+    const mass1ViewPos = this.modelViewTransform.modelToViewPosition(mass1ModelPos);
+    const mass2ViewPos = this.modelViewTransform.modelToViewPosition(mass2ModelPos);
 
     // Update mass positions
     this.mass1Node.center = mass1ViewPos;

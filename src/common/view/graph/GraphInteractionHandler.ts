@@ -160,8 +160,11 @@ export class GraphInteractionHandler {
     // Mouse wheel zoom on the chart area
     this.attach(this.chartRectangle, {
       wheel: (event) => {
+        if (!event.domEvent) {
+          return;
+        }
         event.handle();
-        const delta = event.domEvent!.deltaY;
+        const delta = event.domEvent.deltaY;
 
         // Get mouse position relative to chart
         const pointerPoint = this.chartRectangle.globalToLocalPoint(event.pointer.point);
@@ -278,9 +281,12 @@ export class GraphInteractionHandler {
 
           // If we now have exactly 2 touches, start pinch gesture
           if (activePointers.size === 2) {
-            const points = Array.from(activePointers.values());
-            initialDistance = points[0]!.distance(points[1]!);
-            initialMidpoint = points[0]!.average(points[1]!);
+            const [firstPoint, secondPoint] = activePointers.values();
+            if (!(firstPoint && secondPoint)) {
+              return;
+            }
+            initialDistance = firstPoint.distance(secondPoint);
+            initialMidpoint = firstPoint.average(secondPoint);
             initialXRange = this.chartTransform.modelXRange.copy();
             initialYRange = this.chartTransform.modelYRange.copy();
             this.dataManager.setManuallyZoomed(true);
@@ -296,8 +302,11 @@ export class GraphInteractionHandler {
 
           // If we have exactly 2 touches, perform pinch zoom
           if (activePointers.size === 2 && initialDistance && initialMidpoint && initialXRange && initialYRange) {
-            const points = Array.from(activePointers.values());
-            const currentDistance = points[0]!.distance(points[1]!);
+            const [firstPoint, secondPoint] = activePointers.values();
+            if (!(firstPoint && secondPoint)) {
+              return;
+            }
+            const currentDistance = firstPoint.distance(secondPoint);
 
             // Calculate zoom factor from distance ratio
             const zoomFactor = initialDistance / Math.max(currentDistance, MIN_PINCH_DISTANCE);
@@ -379,9 +388,12 @@ export class GraphInteractionHandler {
             this.dataManager.setManuallyZoomed(true);
           } else if (activePointers.size === 2) {
             // Two touches - prepare for pinch zoom on Y-axis
-            const points = Array.from(activePointers.values());
-            initialYDistance = Math.abs(points[0]!.y - points[1]!.y);
-            initialYMidpoint = (points[0]!.y + points[1]!.y) / 2;
+            const [firstPoint, secondPoint] = activePointers.values();
+            if (!(firstPoint && secondPoint)) {
+              return;
+            }
+            initialYDistance = Math.abs(firstPoint.y - secondPoint.y);
+            initialYMidpoint = (firstPoint.y + secondPoint.y) / 2;
             initialYRange = this.chartTransform.modelYRange.copy();
             singleTouchStartY = null; // Cancel single touch
             this.dataManager.setManuallyZoomed(true);
@@ -408,8 +420,11 @@ export class GraphInteractionHandler {
             this.dataManager.updateTrail();
           } else if (activePointers.size === 2 && initialYDistance && initialYMidpoint !== null && initialYRange) {
             // Two touches - pinch zoom on Y-axis only
-            const points = Array.from(activePointers.values());
-            const currentYDistance = Math.abs(points[0]!.y - points[1]!.y);
+            const [firstPoint, secondPoint] = activePointers.values();
+            if (!(firstPoint && secondPoint)) {
+              return;
+            }
+            const currentYDistance = Math.abs(firstPoint.y - secondPoint.y);
 
             // Calculate zoom factor from Y-distance ratio
             const zoomFactor = initialYDistance / Math.max(currentYDistance, MIN_PINCH_DISTANCE);
@@ -504,8 +519,11 @@ export class GraphInteractionHandler {
     // Add mouse wheel support for Y-axis zooming (zoom vertically only)
     this.attach(this.yAxisInteractionRegion, {
       wheel: (event) => {
+        if (!event.domEvent) {
+          return;
+        }
         event.handle();
-        const delta = event.domEvent!.deltaY;
+        const delta = event.domEvent.deltaY;
 
         // Get mouse position on Y-axis
         const mouseY = event.pointer.point.y;
@@ -557,9 +575,12 @@ export class GraphInteractionHandler {
             this.dataManager.setManuallyZoomed(true);
           } else if (activePointers.size === 2) {
             // Two touches - prepare for pinch zoom on X-axis
-            const points = Array.from(activePointers.values());
-            initialXDistance = Math.abs(points[0]!.x - points[1]!.x);
-            initialXMidpoint = (points[0]!.x + points[1]!.x) / 2;
+            const [firstPoint, secondPoint] = activePointers.values();
+            if (!(firstPoint && secondPoint)) {
+              return;
+            }
+            initialXDistance = Math.abs(firstPoint.x - secondPoint.x);
+            initialXMidpoint = (firstPoint.x + secondPoint.x) / 2;
             initialXRange = this.chartTransform.modelXRange.copy();
             singleTouchStartX = null; // Cancel single touch
             this.dataManager.setManuallyZoomed(true);
@@ -586,8 +607,11 @@ export class GraphInteractionHandler {
             this.dataManager.updateTrail();
           } else if (activePointers.size === 2 && initialXDistance && initialXMidpoint !== null && initialXRange) {
             // Two touches - pinch zoom on X-axis only
-            const points = Array.from(activePointers.values());
-            const currentXDistance = Math.abs(points[0]!.x - points[1]!.x);
+            const [firstPoint, secondPoint] = activePointers.values();
+            if (!(firstPoint && secondPoint)) {
+              return;
+            }
+            const currentXDistance = Math.abs(firstPoint.x - secondPoint.x);
 
             // Calculate zoom factor from X-distance ratio
             const zoomFactor = initialXDistance / Math.max(currentXDistance, MIN_PINCH_DISTANCE);
@@ -682,8 +706,11 @@ export class GraphInteractionHandler {
     // Add mouse wheel support for X-axis zooming (zoom horizontally only)
     this.attach(this.xAxisInteractionRegion, {
       wheel: (event) => {
+        if (!event.domEvent) {
+          return;
+        }
         event.handle();
-        const delta = event.domEvent!.deltaY;
+        const delta = event.domEvent.deltaY;
 
         // Get mouse position on X-axis
         const mouseX = event.pointer.point.x;
@@ -873,7 +900,11 @@ export class GraphInteractionHandler {
     ];
 
     this.resizeHandles.forEach((handle, index) => {
-      handle.setRect(corners[index]!.x + handleOffset, corners[index]!.y + handleOffset, 12, 12);
+      const corner = corners[index];
+      if (!corner) {
+        throw new Error("Unexpected graph resize handle.");
+      }
+      handle.setRect(corner.x + handleOffset, corner.y + handleOffset, 12, 12);
     });
   }
 

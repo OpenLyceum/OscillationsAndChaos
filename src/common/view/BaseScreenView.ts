@@ -142,7 +142,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
   protected configurableGraph: ConfigurableGraph | null = null;
 
   // Model-view transform (available to all screens)
-  protected modelViewTransform: ModelViewTransform2 | null = null;
+  protected abstract readonly modelViewTransform: ModelViewTransform2;
 
   // Info dialog
   private infoDialog: Dialog | null = null;
@@ -303,26 +303,28 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
 
     // Stopwatch tool (SceneryStack component)
     // Position near the toolbox at bottom left
-    this.stopwatch = new Stopwatch({
+    const stopwatch = new Stopwatch({
       position: new Vector2(this.layoutBounds.minX + 160, this.layoutBounds.maxY - 80),
       isVisible: this.showStopwatchProperty.value,
     });
 
     const stopwatchDragBoundsProperty = new Property(this.layoutBounds);
     this.disposeEmitter.addListener(() => stopwatchDragBoundsProperty.dispose());
-    this.stopwatchNode = new StopwatchNode(this.stopwatch, {
+    const stopwatchNode = new StopwatchNode(stopwatch, {
       dragBoundsProperty: stopwatchDragBoundsProperty,
       visibleProperty: this.showStopwatchProperty,
     });
-    this.addChild(this.stopwatchNode);
+    this.stopwatch = stopwatch;
+    this.stopwatchNode = stopwatchNode;
+    this.addChild(stopwatchNode);
 
     // Bidirectional link between showStopwatchProperty and stopwatch visibility
     this.linkProperty(this.showStopwatchProperty, (visible) => {
-      this.stopwatch!.isVisibleProperty.value = visible;
+      stopwatch.isVisibleProperty.value = visible;
     });
 
-    this.linkProperty(this.stopwatch.isVisibleProperty, (visible) => {
-      this.stopwatchNode!.visible = visible;
+    this.linkProperty(stopwatch.isVisibleProperty, (visible) => {
+      stopwatchNode.visible = visible;
     });
   }
 
@@ -340,17 +342,17 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     this.showGridProperty = new BooleanProperty(false);
 
     // Create scale label property for grid
-    const gridScaleLabel = new Property(
+    const gridScaleLabelProperty = new Property(
       visualizationLabels.gridScaleLabelStringProperty.value.replace("{{value}}", gridSpacing.toString()),
     );
     this.linkProperty(visualizationLabels.gridScaleLabelStringProperty, (template: string) => {
-      gridScaleLabel.value = template.replace("{{value}}", gridSpacing.toString());
+      gridScaleLabelProperty.value = template.replace("{{value}}", gridSpacing.toString());
     });
-    this.disposeEmitter.addListener(() => gridScaleLabel.dispose());
+    this.disposeEmitter.addListener(() => gridScaleLabelProperty.dispose());
 
     this.sceneGridNode = new SceneGridNode(modelViewTransform, bounds, {
       gridSpacing: gridSpacing,
-      scaleLabelProperty: gridScaleLabel,
+      scaleLabelProperty: gridScaleLabelProperty,
       visibleProperty: this.showGridProperty,
     });
     this.addChild(this.sceneGridNode);
@@ -376,13 +378,17 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     const graphWidth = this.layoutBounds.centerX - this.layoutBounds.minX - GRAPH_LEFT_MARGIN - GRAPH_RIGHT_MARGIN;
 
     // Time property is always the last item in availableProperties
-    const timePropertyIndex = availableProperties.length - 1;
+    const timeProperty = availableProperties.at(-1);
+    const defaultYProperty = availableProperties[defaultYAxisIndex];
+    if (!(timeProperty && defaultYProperty)) {
+      throw new Error("The graph requires time and default Y properties.");
+    }
 
     // Create the configurable graph
     this.configurableGraph = new ConfigurableGraph(
       availableProperties,
-      availableProperties[timePropertyIndex]!, // Time for x-axis
-      availableProperties[defaultYAxisIndex]!, // Default property for y-axis
+      timeProperty,
+      defaultYProperty,
       graphWidth,
       GRAPH_HEIGHT,
       this, // list parent for combo boxes
@@ -402,14 +408,6 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       this.configurableGraph.left = this.layoutBounds.minX + GRAPH_LEFT_MARGIN;
       this.configurableGraph.top = vectorPanel.bottom + GRAPH_TO_VECTOR_PANEL_SPACING;
     }
-  }
-
-  /**
-   * Get the graph visibility property for use in ToolsControlPanel.
-   * @returns The graph visibility property, or null if no graph exists
-   */
-  protected getGraphVisibilityProperty(): BooleanProperty | null {
-    return this.configurableGraph ? this.configurableGraph.getGraphVisibleProperty() : null;
   }
 
   /**
@@ -527,11 +525,12 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       ySpacing: 15,
       cornerRadius: 10,
       closeButtonListener: () => {
-        this.infoDialog!.hide();
+        infoDialog.hide();
       },
     };
 
-    this.infoDialog = new Dialog(infoContent, dialogOptions);
+    const infoDialog = new Dialog(infoContent, dialogOptions);
+    this.infoDialog = infoDialog;
     // Note: Dialog should NOT be added as a child - it manages its own display layer
     // this.addChild(this.infoDialog);
 
@@ -540,10 +539,10 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
       iconFill: OscillationsAndChaosColors.infoButtonIconColorProperty,
       scale: 0.5,
       listener: () => {
-        if (this.infoDialog!.isShowingProperty.value) {
-          this.infoDialog!.hide();
+        if (infoDialog.isShowingProperty.value) {
+          infoDialog.hide();
         } else {
-          this.infoDialog!.show();
+          infoDialog.show();
         }
       },
       right: this.layoutBounds.maxX - 60,
@@ -833,15 +832,16 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
    * @param detectCustomChangeProperties - Array of properties to monitor for custom changes
    */
   protected setupPresetManagement(
-    presets: Preset[],
+    presets: [Preset, ...Preset[]],
     applyPresetCallback: (preset: Preset) => void,
     detectCustomChangeProperties: Property<number>[],
   ): void {
     this.presets = presets;
-    this.presetProperty = new Property<Preset | "Custom">(presets[0]!);
+    const presetProperty = new Property<Preset | "Custom">(presets[0]);
+    this.presetProperty = presetProperty;
 
     // Listen for preset changes to apply configuration
-    this.linkProperty(this.presetProperty, (preset) => {
+    this.linkProperty(presetProperty, (preset) => {
       if (preset !== "Custom" && !this.isApplyingPreset) {
         applyPresetCallback(preset);
       }
@@ -849,8 +849,8 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
 
     // Listen to model parameter changes to detect user modifications
     const detectCustomChange = () => {
-      if (!this.isApplyingPreset && this.presetProperty!.value !== "Custom") {
-        this.presetProperty!.value = "Custom";
+      if (!this.isApplyingPreset && presetProperty.value !== "Custom") {
+        presetProperty.value = "Custom";
       }
     };
 
@@ -862,9 +862,10 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
   /**
    * Setup vector and tools control panels with standard configuration.
    * Call this after the graph has been created.
+   * @param graph - The graph controlled by the tools panel
    * @param includeProtractor - Whether to include protractor in tools panel
    */
-  protected setupVectorAndToolsPanels(includeProtractor: boolean = true): void {
+  protected setupVectorAndToolsPanels(graph: ConfigurableGraph, includeProtractor: boolean): Node {
     const stringManager = StringManager.getInstance();
     const visualizationLabels = stringManager.getVisualizationLabels();
     const graphLabels = stringManager.getGraphLabels();
@@ -902,9 +903,13 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     this.addChild(this.vectorPanel);
 
     // Create tools control panel configuration
+    const showGridProperty = this.showGridProperty;
+    if (!showGridProperty) {
+      throw new Error("Set up the grid before creating the tools panel.");
+    }
     const toolsConfig: ToolsControlPanelOptions = {
       grid: {
-        showProperty: this.showGridProperty!,
+        showProperty: showGridProperty,
         labelProperty: visualizationLabels.showGridStringProperty,
         a11yStrings: {
           shown: a11yStrings.gridShownStringProperty,
@@ -928,7 +933,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
         },
       },
       graph: {
-        showProperty: this.getGraphVisibilityProperty()!,
+        showProperty: graph.getGraphVisibleProperty(),
         labelProperty: graphLabels.showGraphStringProperty,
         a11yStrings: {
           shown: a11yStrings.graphShownStringProperty,
@@ -953,6 +958,7 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     this.toolsPanel.left = this.layoutBounds.minX + 10;
     this.toolsPanel.bottom = this.layoutBounds.maxY - 10;
     this.addChild(this.toolsPanel);
+    return this.vectorPanel;
   }
 
   /**

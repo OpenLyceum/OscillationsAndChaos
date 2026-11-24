@@ -8,7 +8,7 @@ import { StringManager } from "../../i18n/StringManager.js";
 import OscillationsAndChaosNamespace from "../../OscillationsAndChaosNamespace.js";
 
 export const PendulumPresets = {
-  getPresets(): Preset[] {
+  getPresets(): [Preset, ...Preset[]] {
     const stringManager = StringManager.getInstance();
     const presetStrings = stringManager.getPendulumPresets();
 

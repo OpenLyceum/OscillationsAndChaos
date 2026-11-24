@@ -37,7 +37,11 @@ export abstract class BaseModel {
   public readonly canStepBackwardProperty = new BooleanProperty(false);
 
   // Bound memory while retaining roughly three minutes at 60 frames per second.
-  private readonly history: { time: number; state: number[]; parameters: number[] }[] = [];
+  private readonly history: {
+    time: number;
+    state: number[];
+    parameters: { property: NumberProperty; value: number }[];
+  }[] = [];
   private readonly maxHistoryLength = 10000;
 
   // Physics solver (can be swapped based on preference)
@@ -160,7 +164,7 @@ export abstract class BaseModel {
     this.history.push({
       time: this.timeProperty.value,
       state: state.slice(),
-      parameters: this.getHistoryParameters().map((property) => property.value),
+      parameters: this.getHistoryParameters().map((property) => ({ property, value: property.value })),
     });
     if (this.history.length > this.maxHistoryLength) {
       this.history.shift();
@@ -192,16 +196,20 @@ export abstract class BaseModel {
 
   /** Restore a recorded frame at or before the requested time, never integrate backward. */
   private restorePreviousState(targetTime: number): void {
-    if (this.history.length === 0) {
+    let snapshot = this.history.pop();
+    if (snapshot === undefined) {
       return;
     }
-    let snapshot = this.history.pop()!;
-    while (snapshot.time > targetTime + 1e-12 && this.history.length > 0) {
-      snapshot = this.history.pop()!;
+    while (snapshot.time > targetTime + 1e-12) {
+      const previous = this.history.pop();
+      if (previous === undefined) {
+        break;
+      }
+      snapshot = previous;
     }
-    this.getHistoryParameters().forEach((property, index) => {
-      property.value = snapshot.parameters[index]!;
-    });
+    for (const { property, value } of snapshot.parameters) {
+      property.value = value;
+    }
     this.setState(snapshot.state);
     this.timeProperty.value = snapshot.time;
     this.canStepBackwardProperty.value = this.history.length > 0;
