@@ -53,7 +53,8 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
   private currentSpringNode: SpringNode | ParametricSpringNode;
   private readonly fixedPoint: Vector2;
   protected override readonly presetProperty: Property<PresetOption>;
-  protected override readonly presets: Preset[];
+  protected override readonly presets: [Preset, ...Preset[]];
+  protected readonly modelViewTransform: ModelViewTransform2;
   protected override isApplyingPreset: boolean = false;
 
   // Vector visualization
@@ -76,7 +77,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     this.presets = SingleSpringPresets.getPresets();
 
     // Initialize with first preset as default
-    this.presetProperty = new Property<PresetOption>(this.presets[0]!);
+    this.presetProperty = new Property<PresetOption>(this.presets[0]);
 
     // Fixed point for spring attachment (top of screen, centered horizontally)
     // Position the fixed point at the wall location for proper attachment
@@ -182,12 +183,12 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     this.addDisposableInputListener(
       this.massNode,
       new RichDragListener({
-        transform: this.modelViewTransform!,
+        transform: this.modelViewTransform,
         dragListenerOptions: {
           translateNode: false,
           start: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
-            const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
+            const pointerModelY = this.modelViewTransform.viewToModelY(parentPoint.y);
             const currentModelPosition = this.model.positionProperty.value;
             dragOffsetModel = currentModelPosition - pointerModelY;
             SimulationAnnouncer.announceDragInteraction(
@@ -197,7 +198,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
           },
           drag: (event) => {
             const parentPoint = this.globalToLocalPoint(event.pointer.point);
-            const pointerModelY = this.modelViewTransform!.viewToModelY(parentPoint.y);
+            const pointerModelY = this.modelViewTransform.viewToModelY(parentPoint.y);
             this.model.positionProperty.value = constrainSpringDragPosition(
               this.model.positionProperty.value,
               pointerModelY + dragOffsetModel,
@@ -303,7 +304,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     });
 
     // Apply the first preset immediately
-    this.applyPreset(this.presets[0]!);
+    this.applyPreset(this.presets[0]);
 
     // Create configurable graph with available properties
     const stringManager = StringManager.getInstance();
@@ -357,18 +358,18 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     ];
 
     // Setup the configurable graph (position vs time by default)
-    this.setupConfigurableGraph(availableProperties, 0);
-    this.addChild(this.configurableGraph!);
+    const graph = this.setupConfigurableGraph(availableProperties, 0);
+    this.addChild(graph);
 
     // Position control panel at the top right
     controlPanel.right = this.layoutBounds.maxX - 10;
     controlPanel.top = this.layoutBounds.minY + 10;
 
     // Setup vector and tools panels using base class method (no protractor for spring screens)
-    this.setupVectorAndToolsPanels(false);
+    const vectorPanel = this.setupVectorAndToolsPanels(graph, false);
 
     // Position graph beneath vector panel
-    this.positionConfigurableGraph(this.vectorPanel!);
+    this.positionConfigurableGraph(vectorPanel);
 
     // pdom - Setup screen summary for Interactive Description
     this.setupScreenSummary();
@@ -526,7 +527,7 @@ export class SingleSpringScreenView extends BaseScreenView<SingleSpringModel> {
     const naturalLength = this.model.naturalLengthProperty.value;
     const totalLength = naturalLength + position;
     const modelPosition = new Vector2(0, totalLength);
-    const viewPosition = this.modelViewTransform!.modelToViewPosition(modelPosition);
+    const viewPosition = this.modelViewTransform.modelToViewPosition(modelPosition);
 
     // Update mass position
     this.massNode.center = viewPosition;

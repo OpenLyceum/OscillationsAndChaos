@@ -147,14 +147,15 @@ export class GraphDataManager {
    * Update axis ranges to fit all data with some padding
    */
   public updateAxisRanges(): void {
-    if (this.dataPoints.length === 0) {
+    const firstPoint = this.dataPoints[0];
+    if (!firstPoint) {
       return;
     }
 
-    let xMin = this.dataPoints[0]!.x;
-    let xMax = this.dataPoints[0]!.x;
-    let yMin = this.dataPoints[0]!.y;
-    let yMax = this.dataPoints[0]!.y;
+    let xMin = firstPoint.x;
+    let xMax = firstPoint.x;
+    let yMin = firstPoint.y;
+    let yMax = firstPoint.y;
 
     for (const point of this.dataPoints) {
       xMin = Math.min(xMin, point.x);

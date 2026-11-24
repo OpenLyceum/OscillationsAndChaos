@@ -57,12 +57,12 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
   private readonly pivotNode: Circle;
   private readonly trailPath: Path;
   private readonly pivotPoint: Vector2;
-  private readonly trailPoints: Vector2[] = [];
-  private readonly trailTimes: number[] = [];
+  private readonly trail: { readonly point: Vector2; readonly time: number }[] = [];
   private readonly maxTrailPoints: number = 500;
   private readonly trailVisibleProperty: BooleanProperty;
   protected override readonly presetProperty: Property<PresetOption>;
-  protected override readonly presets: Preset[];
+  protected override readonly presets: [Preset, ...Preset[]];
+  protected readonly modelViewTransform: ModelViewTransform2;
   protected override isApplyingPreset: boolean = false;
 
   // Dragging state for protractor
@@ -96,7 +96,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     this.presets = DoublePendulumPresets.getPresets();
 
     // Initialize with first preset as default
-    this.presetProperty = new Property<PresetOption>(this.presets[0]!);
+    this.presetProperty = new Property<PresetOption>(this.presets[0]);
 
     // Pivot point (top center)
     this.pivotPoint = new Vector2(this.layoutBounds.centerX, this.layoutBounds.minY + 100);
@@ -311,7 +311,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
             const angle1 = this.model.angle1Property.value;
             const length1 = this.model.length1Property.value;
             const bob1ModelPos = new Vector2(length1 * Math.sin(angle1), length1 * Math.cos(angle1));
-            const bob1ViewPos = this.modelViewTransform!.modelToViewPosition(bob1ModelPos);
+            const bob1ViewPos = this.modelViewTransform.modelToViewPosition(bob1ModelPos);
             const delta = parentPoint.minus(bob1ViewPos);
             const angle = Math.atan2(delta.x, delta.y);
             this.model.angle2Property.value = angle;
@@ -460,7 +460,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     });
 
     // Apply the first preset immediately
-    this.applyPreset(this.presets[0]!);
+    this.applyPreset(this.presets[0]);
 
     // Create configurable graph with available properties
     const propertyNames = this.stringManager.getGraphPropertyNames();
@@ -518,18 +518,18 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     ];
 
     // Setup the configurable graph (angle1 vs time by default)
-    this.setupConfigurableGraph(availableProperties, 0);
-    this.addChild(this.configurableGraph!);
+    const graph = this.setupConfigurableGraph(availableProperties, 0);
+    this.addChild(graph);
 
     // Position control panel at the top right
     controlPanel.right = this.layoutBounds.maxX - 10;
     controlPanel.top = this.layoutBounds.minY + 10;
 
     // Setup vector and tools panels using base class method (includes protractor for pendulum)
-    this.setupVectorAndToolsPanels(true);
+    const vectorPanel = this.setupVectorAndToolsPanels(graph, true);
 
     // Position graph beneath vector panel
-    this.positionConfigurableGraph(this.vectorPanel!);
+    this.positionConfigurableGraph(vectorPanel);
 
     // pdom - Setup screen summary for Interactive Description
     this.setupScreenSummary();
@@ -735,7 +735,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     const bob1ModelPos = new Vector2(bob1ModelX, bob1ModelY);
 
     // Convert bob 1 to view coordinates
-    const bob1ViewPos = this.modelViewTransform!.modelToViewPosition(bob1ModelPos);
+    const bob1ViewPos = this.modelViewTransform.modelToViewPosition(bob1ModelPos);
 
     // Calculate bob 2 position in model coordinates (relative to bob 1)
     const bob2ModelX = bob1ModelX + length2 * Math.sin(angle2);
@@ -743,7 +743,7 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
     const bob2ModelPos = new Vector2(bob2ModelX, bob2ModelY);
 
     // Convert bob 2 to view coordinates
-    const bob2ViewPos = this.modelViewTransform!.modelToViewPosition(bob2ModelPos);
+    const bob2ViewPos = this.modelViewTransform.modelToViewPosition(bob2ModelPos);
 
     // Update bob positions
     this.bob1Node.center = bob1ViewPos;
@@ -760,43 +760,41 @@ export class DoublePendulumScreenView extends BaseScreenView<DoublePendulumModel
 
     // Render-only updates (including paused frames) must not age the trail.
     const time = this.model.timeProperty.value;
-    const lastTime = this.trailTimes[this.trailTimes.length - 1];
-    if (lastTime !== undefined && time < lastTime) {
-      while (this.trailTimes.length > 0 && this.trailTimes[this.trailTimes.length - 1]! >= time) {
-        this.trailTimes.pop();
-        this.trailPoints.pop();
+    let last = this.trail.at(-1);
+    if (last && time < last.time) {
+      while (last && last.time >= time) {
+        this.trail.pop();
+        last = this.trail.at(-1);
       }
     }
-    if (this.trailTimes[this.trailTimes.length - 1] !== time) {
-      this.addTrailPoint(bob2ViewPos);
+    if (last?.time !== time) {
+      this.addTrailPoint(bob2ViewPos, time);
     }
   }
 
-  private addTrailPoint(point: Vector2): void {
-    this.trailPoints.push(point.copy());
-    this.trailTimes.push(this.model.timeProperty.value);
+  private addTrailPoint(position: Vector2, time: number): void {
+    this.trail.push({ point: position.copy(), time });
 
-    // Limit trail length
-    if (this.trailPoints.length > this.maxTrailPoints) {
-      this.trailPoints.shift();
-      this.trailTimes.shift();
+    if (this.trail.length > this.maxTrailPoints) {
+      this.trail.shift();
     }
 
     this.trailPath.shape = null;
-    // Update trail shape
-    if (this.trailPoints.length > 1) {
+    if (this.trail.length > 1) {
       const shape = new Shape();
-      shape.moveToPoint(this.trailPoints[0]!);
-      for (let i = 1; i < this.trailPoints.length; i++) {
-        shape.lineToPoint(this.trailPoints[i]!);
-      }
+      this.trail.forEach(({ point }, index) => {
+        if (index === 0) {
+          shape.moveToPoint(point);
+        } else {
+          shape.lineToPoint(point);
+        }
+      });
       this.trailPath.shape = shape;
     }
   }
 
   private clearTrail(): void {
-    this.trailPoints.length = 0;
-    this.trailTimes.length = 0;
+    this.trail.length = 0;
     this.trailPath.shape = null;
   }
 
