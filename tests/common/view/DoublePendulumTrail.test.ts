@@ -28,29 +28,29 @@ it("preserves the trail during pause and removes the abandoned future on rewind"
   vi.stubGlobal("katex", { render: vi.fn() });
   const model = new DoublePendulumModel(new OscillationsAndChaosPreferencesModel());
   const view = new DoublePendulumScreenView(model);
-  const points = Reflect.get(view, "trailPoints") as Vector2[];
-  const times = Reflect.get(view, "trailTimes") as number[];
+  const trail = Reflect.get(view, "trail") as { readonly point: Vector2; readonly time: number }[];
+  const points = () => trail.map(({ point }) => point);
   const step = (dt: number) => {
     model.step(dt, true);
     view.step(dt);
   };
   try {
     step(0.016);
-    const first = points.map((point) => point.copy());
+    const first = points().map((point) => point.copy());
     step(0.016);
     model.isPlayingProperty.value = false;
-    const paused = points.map((point) => point.copy());
+    const paused = points().map((point) => point.copy());
     for (let i = 0; i < 600; i++) {
       model.step(1 / 60);
       view.step(1 / 60);
     }
-    expect(points).toEqual(paused);
+    expect(points()).toEqual(paused);
     step(-0.016);
-    expect(points).toEqual(first);
-    expect(times.every((time) => time <= model.timeProperty.value)).toBe(true);
+    expect(points()).toEqual(first);
+    expect(trail.every(({ time }) => time <= model.timeProperty.value)).toBe(true);
     model.reset();
     view.reset();
-    expect(times).toEqual([0]);
+    expect(trail.map(({ time }) => time)).toEqual([0]);
   } finally {
     view.dispose();
     model.dispose();
