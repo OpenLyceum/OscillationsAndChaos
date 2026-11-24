@@ -342,17 +342,17 @@ export abstract class BaseScreenView<T extends TimeControllableModel> extends Sc
     this.showGridProperty = new BooleanProperty(false);
 
     // Create scale label property for grid
-    const gridScaleLabel = new Property(
+    const gridScaleLabelProperty = new Property(
       visualizationLabels.gridScaleLabelStringProperty.value.replace("{{value}}", gridSpacing.toString()),
     );
     this.linkProperty(visualizationLabels.gridScaleLabelStringProperty, (template: string) => {
-      gridScaleLabel.value = template.replace("{{value}}", gridSpacing.toString());
+      gridScaleLabelProperty.value = template.replace("{{value}}", gridSpacing.toString());
     });
-    this.disposeEmitter.addListener(() => gridScaleLabel.dispose());
+    this.disposeEmitter.addListener(() => gridScaleLabelProperty.dispose());
 
     this.sceneGridNode = new SceneGridNode(modelViewTransform, bounds, {
       gridSpacing: gridSpacing,
-      scaleLabelProperty: gridScaleLabel,
+      scaleLabelProperty: gridScaleLabelProperty,
       visibleProperty: this.showGridProperty,
     });
     this.addChild(this.sceneGridNode);
